@@ -1,0 +1,16 @@
+# Salaisuudet EIVAT elä tässä kansiossa (ne ovat ~/.config/vegan-news/),
+# mutta nama rivit ovat varmuuden vuoksi jos joku luo paikallisen .env:in
+# tanne vahingossa - GitHubiin pushatessa nailla ei ole mitaan asiaa mukaan.
+.env
+.env.*
+*.env
+!.env.example
+secrets/
+
+# Python
+__pycache__/
+*.pyc
+
+# Skriptien ajossa syntyvat vaeliaikaistiedostot, jos joku ajaa niita tasta
+# kansiosta ulostulopolkua maarittamatta
+*.log

@@ -1,0 +1,17 @@
+# macOS
+.DS_Store
+
+# Defense in depth: secrets should never live under this repo root anyway
+# (they live in ~/.config/vegan-news/, outside this tree entirely), but
+# these patterns guard against a future mistake.
+.env
+.env.*
+*.env
+!.env.example
+secrets/
+
+# Python
+__pycache__/
+*.pyc
+
+*.log

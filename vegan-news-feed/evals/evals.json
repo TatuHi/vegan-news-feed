@@ -1,0 +1,23 @@
+{
+  "skill_name": "vegan-news-feed",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Aja vegan-news-feed-skilli ja lähetä tämän päivän koonti Discordiin.",
+      "expected_output": "Skilli hakee RSS:t, arvioi relevanssin harkiten (ei kaikkea läpi), kirjoittaa suomenkieliset tiivistelmät, muotoilee viestin annetulla pohjalla, ja lähettää sen onnistuneesti webhookiin. Jos ei relevantteja uutisia, lähettää lyhyen 'ei uutisia tänään' -viestin sen sijaan että keksisi jotain.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Koosta tämän päivän vegaaniuutiset, mutta älä lähetä Discordiin — näytä minulle vain viesti ensin.",
+      "expected_output": "Skilli tuottaa muotoillun viestin (steps 1-5) mutta pysähtyy ennen post_discord.py-kutsua, koska käyttäjä pyysi tarkistusta ensin. Tunnistaa että lähetys on oma erillinen askel jonka voi ohittaa.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Onko tänään mitään sellaista vegaaniuutista josta olisi hyvä tehdä oma some-postaus?",
+      "expected_output": "Skilli suorittaa haun ja relevanssiarvion, mutta painottaa vastauksessaan nimenomaan vaiheen 4 sisältöideaosiota (kulma + miksi juuri nyt) sen sijaan että listaisi vain kaikki uutiset tasapuolisesti. Jos mikään ei anna hyvää lähtökohtaa, sanoo niin suoraan sen sijaan että pakottaa ehdotuksen.",
+      "files": []
+    }
+  ]
+}
