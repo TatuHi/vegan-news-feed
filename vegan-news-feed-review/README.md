@@ -2,6 +2,12 @@
 
 A companion [Claude Code](https://claude.com/claude-code) skill that reviews its sibling, [`vegan-news-feed`](../vegan-news-feed/), and proposes improvements — without ever applying them itself.
 
+## ⚠️ Disclaimer
+
+`scripts/run_weekly_review.sh` was written by Claude (an AI, via Claude Code), iteratively, as documented in [`../vegan-news-feed/PROCESS.md`](../vegan-news-feed/PROCESS.md). **It has not been independently reviewed by a human for correctness, security, or safety.**
+
+If you clone and run this code — especially if you schedule it via cron, where it runs unattended with your credentials — **read it yourself first.** Don't run it blindly. The repository owner takes no responsibility for what happens if you do.
+
 ## What it does
 
 Reads the send history `vegan-news-feed` accumulates (`~/.config/vegan-news/sent_history.json` — what was actually sent, from where, and the real summary/content-idea text, not just headlines), looks for concrete patterns over the review window (default: last 7 days) — sources that never contribute, thin or repetitive summaries, content ideas that feel forced, coverage gaps, and run-outcome patterns (how many days had no relevant news at all, any backfilled or unrecoverable gaps) — and writes a dated, specific proposal file to `vegan-news-feed/proposals/`. It then posts a short Discord notification pointing to it.

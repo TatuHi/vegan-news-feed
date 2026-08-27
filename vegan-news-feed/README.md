@@ -6,6 +6,12 @@ It's built with a sibling skill, [`vegan-news-feed-review`](../vegan-news-feed-r
 
 Design rationale and iteration history: see [`PROCESS.md`](PROCESS.md). Full agent instructions the skill actually runs on: see [`SKILL.md`](SKILL.md). Open items: see [`TODO.md`](TODO.md). Want to see what it actually produces before reading further? See [`example-output.md`](example-output.md) — a real sent digest, captured verbatim.
 
+## ⚠️ Disclaimer
+
+Every script in this repository (`fetch_feeds.py`, `post_discord.py`, `history.py`, `run_daily.sh`) was written by Claude (an AI, via Claude Code), iteratively, as documented in `PROCESS.md`. **None of it has been independently reviewed by a human for correctness, security, or safety** — it has been tested for behavior (see `PROCESS.md`'s testing notes and `evals/`), which is not the same thing as a security or code review.
+
+If you clone and run this code — especially if you schedule it via cron, where it runs unattended with your credentials — **read it yourself first.** Don't run it blindly. The repository owner takes no responsibility for what happens if you do.
+
 ## What it looks for
 
 **Included:**
