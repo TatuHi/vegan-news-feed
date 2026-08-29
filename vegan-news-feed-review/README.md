@@ -43,6 +43,10 @@ Proposals it produces live in `../vegan-news-feed/proposals/`, not here — they
 
 The first real run (2026-08-26) is preserved as-is at [`../vegan-news-feed/proposals/2026-08-26.md`](../vegan-news-feed/proposals/2026-08-26.md) — it correctly found only one day of thin, pre-schema-change history and reported honestly that there wasn't enough data to review yet, rather than inventing findings. A more typical proposal, once real week-over-week data exists, will look like the template in `SKILL.md`'s step 5: dated observations plus concrete, file-and-line-specific suggestions.
 
+## Platform support
+
+**macOS only, currently** — same situation as `vegan-news-feed`, not duplicated here. See its README's "Platform support" section for what's portable (the skill logic, fully) and what isn't (this script's Bash/macOS-specific wrapper and scheduling approach).
+
 ## Open items
 
 Tracked centrally, not duplicated here — see [`../vegan-news-feed/TODO.md`](../vegan-news-feed/TODO.md) (has a section for this skill too).

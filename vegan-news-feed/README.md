@@ -80,6 +80,16 @@ This pipeline is meant to run unattended, so a fair amount of it is about failur
 
 Full detail on all of the above: `SKILL.md`'s "Puuttuvien päivien täyttäminen" and "Ajastaminen" sections, and `PROCESS.md`'s iteration history.
 
+## Platform support
+
+**macOS only, currently.** This was built and hardened entirely against real failures on one Mac, and that shows in what's and isn't portable:
+
+- **Generalizes cleanly, no changes needed:** `SKILL.md`'s actual workflow and `scripts/fetch_feeds.py` / `post_discord.py` / `history.py` — pure Python standard library, no OS-specific calls anywhere. These run identically on Linux or Windows given any Python 3.10+.
+- **Doesn't generalize as-is:** `run_daily.sh` is a Bash script with hardcoded macOS paths (the python.org installer convention) and a macOS-only notification command (`osascript`). More fundamentally, its scheduling approach — a macOS LaunchAgent, not cron — exists specifically because of a macOS quirk: cron runs outside the GUI login session and can't reach Keychain-based credentials there (see `PROCESS.md` iteration 6). Linux's cron might not have that particular problem (untested claim, not a verified one), but the wrapper script would still need reworking (swap `osascript` for `notify-send`, fix the hardcoded paths). Windows has no bash/cron/launchd at all — porting means a fresh wrapper (PowerShell + Task Scheduler) and answering the credential-access question fresh for however Claude Code stores login on Windows.
+- **Android isn't a portability gap to close** — Claude Code doesn't run on Android as a supported platform at all, so there's no version of this skill that runs there short of an unsupported workaround (e.g. Termux), which is a different situation entirely, not a port of this project.
+
+Porting this to another OS would be a real effort — a fresh round of "what actually works on this machine" debugging in that OS's own environment, the same way this repo's `PROCESS.md` documents for macOS — not just copying files over.
+
 ## Sibling skill: vegan-news-feed-review
 
 [`vegan-news-feed-review`](../vegan-news-feed-review/) reads this skill's send history periodically (weekly by default, but runnable any time) and writes dated, specific improvement proposals to `proposals/` — sources that never contribute, thin summaries, forced-feeling content ideas, coverage gaps. **It never edits this skill's files.** Applying a proposal is always a separate, human-approved, interactive step, documented afterward in `PROCESS.md` — see that sibling skill's own README for why it's a separate skill rather than a mode of this one.
