@@ -1,16 +1,22 @@
 #!/bin/bash
-# Ajaa vegan-news-feed-review-skillin - joko cronista/ajastetusti, TAI
-# suoraan terminaalista milloin tahansa manuaalisesti tarvittaessa. Tama
-# skripti ei ITSESSAAN ole sidottu viikkoaikatauluun - se vain hoitaa saman
-# ymparistoturvallisuuden (Python-polku, SSL, hälytykset) kuin
-# vegan-news-feed/scripts/run_daily.sh, jotta katselmointi voi olla yhta
-# luotettava ajaa kuin itse paapipeline.
+# Ajaa vegan-news-feed-review-skillin - joko ajastetusti, TAI suoraan
+# terminaalista milloin tahansa manuaalisesti tarvittaessa. Tama skripti
+# ei ITSESSAAN ole sidottu viikkoaikatauluun - se vain hoitaa saman
+# ymparistoturvallisuuden (Python-polku, claude-polku, SSL, hälytykset)
+# kuin vegan-news-feed/scripts/run_daily.sh, jotta katselmointi voi olla
+# yhta luotettava ajaa kuin itse paapipeline.
 #
 # Kaytto ajastamatta (mika tahansa hetki):
 #   ~/.claude/skills/vegan-news-feed-review/scripts/run_weekly_review.sh
 #
-# Kaytto ajastettuna (esim. joka sunnuntai klo 20):
-#   0 20 * * 0 /Users/<kayttaja>/.claude/skills/vegan-news-feed-review/scripts/run_weekly_review.sh >> ~/Library/Logs/vegan-news-feed-review.log 2>&1
+# Kaytto ajastettuna: KAYTA macOS:n LaunchAgentia, EI crontabia. Cron on
+# toteutettu LaunchDaemonina joka ei aja GUI-kirjautumisistunnon sisalla,
+# jolloin "claude"-komennon Keychain-pohjainen OAuth-kirjautuminen ei
+# toimi ("Not logged in") - taman huomasi vegan-news-feed puolella
+# 2026-08-29 vasta oikealla cron-laukaisulla, ks. sen SKILL.md:n
+# "Ajastaminen"-osio taydelle selitykselle ja LaunchAgent-plist-mallille.
+# Sama korjaus (CLAUDE_BIN-muuttuja alla) ja sama LaunchAgent-malli
+# patevat tahankin skriptiin, vaikka sita ei viela ole ajastettu.
 #
 # Webhook-URL EI ole tassa tiedostossa: se luetaan samasta
 # ~/.config/vegan-news/.env -tiedostosta jota vegan-news-feed kayttaa (sama
@@ -66,10 +72,22 @@ export SSL_CERT_FILE
 SSL_CERT_FILE="$("$PYTHON311" -c 'import certifi; print(certifi.where())')"
 export PATH="/Library/Frameworks/Python.framework/Versions/3.11/bin:$PATH"
 
+# Sama luokan ongelma kuin PYTHON311:n kanssa - cronin suppea PATH ei
+# sisalla ~/.local/bin:ia, missa claude CLI asuu talla koneella. Loydettiin
+# run_daily.sh:sta oikealla cron-laukaisulla 2026-08-28 (exit 127); korjattu
+# ennalta ehkaisevasti myos tanne samalla logiikalla, vaikka tata skillia
+# ei ole viela ajastettu.
+CLAUDE_BIN="$HOME/.local/bin/claude"
+if [ ! -x "$CLAUDE_BIN" ]; then
+  echo "[run_weekly_review.sh] claude-komentoa ei loydy polusta $CLAUDE_BIN" >&2
+  notify_failure 1
+  exit 1
+fi
+
 cd "$HOME/.claude/skills/vegan-news-feed-review"
 
 # Ei "exec" tassa: trap ERR ei laukeaisi enaa taman prosessin jalkeen.
 # Ei tarvita WebFetch/WebSearch-oikeuksia - taama skilli ei hae ulkoista
 # dataa, vain lukee vegan-news-feedin paikallista historiaa ja tiedostoja.
-claude -p "Aja vegan-news-feed-review-skilli ja tee viikkokatsaus vegan-news-feedin viimeisen viikon toiminnasta" \
+"$CLAUDE_BIN" -p "Aja vegan-news-feed-review-skilli ja tee viikkokatsaus vegan-news-feedin viimeisen viikon toiminnasta" \
   --allowedTools "Bash,Read,Write"

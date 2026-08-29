@@ -198,20 +198,53 @@ Cron ei herätä nukkuvaa/sammutettua Macia (ks. "Ajastaminen" alla) — jos ajo
 
 ## Ajastaminen
 
-Kun putki toimii manuaalisesti ajettuna, voit ajastaa sen cronilla käyttäen Claude Codea headless-tilassa (`-p`-lippu). Älä laita komentoa suoraan crontabiin — cronin PATH on suppea (ei lataa `.zshrc`/`.bash_profile`-tiedostoja) ja webhook-URL ei kuulu näkyä plaintextinä `crontab -l`:ssä. Käytä sen sijaan `scripts/run_daily.sh`-wrapperia:
+**Käytä macOS:n LaunchAgentia, ei crontabia.** Tämä on opittu kantapään kautta 2026-08-29: cron on toteutettu macOS:ssä `com.vix.cron`-nimisenä LaunchDaemonina, joka EI aja ohjelmia käyttäjän varsinaisen kirjautumisistunnon (Aqua/GUI-session) sisällä. `claude`-komennon kirjautuminen (OAuth) lukee tunnistetiedot macOS:n avainnipusta (Keychain), johon vain oikean kirjautumisistunnon sisällä ajettavilla prosesseilla on pääsy — cronista ajettuna `claude -p` epäonnistuu viestillä "Not logged in · Please run /login", vaikka `run_daily.sh` itsessään toimisi täydellisesti. Tätä ei huomattu ennen kuin ajo laukaistiin oikeasti cronista, ei vain interaktiivisesti terminaalissa (ks. `PROCESS.md`:n iteraatio 6).
 
-```bash
-0 8 * * * /Users/<käyttäjä>/.claude/skills/vegan-news-feed/scripts/run_daily.sh >> ~/Library/Logs/vegan-news-feed.log 2>&1
+LaunchAgent (toisin kuin LaunchDaemon/cron) ajetaan käyttäjän GUI-istunnon sisällä ja säilyttää siten normaalin Keychain-pääsyn — sama `claude`-kirjautuminen toimii ilman erillistä API-avainta. Vaihtoehtoinen ratkaisu olisi `claude --bare` + `ANTHROPIC_API_KEY`-ympäristömuuttuja (ohittaa Keychainin kokonaan), mutta se vaatisi erillisen, laskutettavan API-avaimen olemassa olevan tilauksen sijaan — LaunchAgent on siis oletusvalinta jos haluat käyttää samaa kirjautumista jota käytät muutenkin.
+
+**Asennus:**
+
+1. Luo `~/Library/LaunchAgents/com.<sinä>.vegan-news-feed.daily.plist`:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.&lt;sinä&gt;.vegan-news-feed.daily</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/&lt;käyttäjä&gt;/.claude/skills/vegan-news-feed/scripts/run_daily.sh</string>
+    </array>
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Hour</key>
+        <integer>13</integer>
+        <key>Minute</key>
+        <integer>0</integer>
+    </dict>
+    <key>StandardOutPath</key>
+    <string>/Users/&lt;käyttäjä&gt;/Library/Logs/vegan-news-feed.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/&lt;käyttäjä&gt;/Library/Logs/vegan-news-feed.log</string>
+    <key>RunAtLoad</key>
+    <false/>
+</dict>
+</plist>
 ```
 
-`run_daily.sh` hoitaa nämä puolestasi:
+2. Lataa se: `launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.<sinä>.vegan-news-feed.daily.plist`
+3. Poista se myöhemmin tarvittaessa: `launchctl bootout gui/$(id -u)/com.<sinä>.vegan-news-feed.daily`
 
-- Lukee `DISCORD_WEBHOOK_URL`:n omasta `0600`-oikeuksin suojatusta tiedostosta `~/.config/vegan-news/.env` — ei crontabista eikä skriptiin kovakoodattuna.
-- Osoittaa suoraan toimivaan Python 3.11 -asennukseen ja sen SSL-varmenteisiin PATH-haun sijaan (moni koneen muu `python3` ei toimi tämän skillin kanssa — ks. `PYTHON311`-muuttuja skriptissä).
+`run_daily.sh` hoitaa loput puolestasi:
+
+- Lukee `DISCORD_WEBHOOK_URL`:n omasta `0600`-oikeuksin suojatusta tiedostosta `~/.config/vegan-news/.env` — ei ajastustiedostosta eikä skriptiin kovakoodattuna.
+- Osoittaa suoraan toimivaan Python 3.11 -asennukseen ja sen SSL-varmenteisiin PATH-haun sijaan (moni koneen muu `python3` ei toimi tämän skillin kanssa — ks. `PYTHON311`-muuttuja skriptissä), ja samoin suoraan `claude`-binaariin (`CLAUDE_BIN`-muuttuja) samasta syystä: ajastetun ajon suppea PATH ei sisällä sitä, vaikka interaktiivinen shell aina löytäisi sen.
 - Kutsuu `claude -p`:tä oikeilla työkaluoikeuksilla: `--allowedTools "Bash,Read,Write,WebFetch,WebSearch"` (`Write` tarvitaan koosteen tallentamiseen, `WebFetch`/`WebSearch` vaiheen 1 varapolkuun ja vaiheen 3 lähteiden rikastamiseen).
 - Jos ajo epäonnistuu millä tahansa vaiheella, lähettää lyhyen ⚠️-varoitusviestin samaan Discord-webhookiin, jotta epäonnistuminen ei jää huomaamatta hiljaisesti — ei vain lokiin jota kukaan ei lue.
 
-Testaa `run_daily.sh` manuaalisesti terminaalissa ennen kuin lisäät sen crontabiin (huom: se lähettää oikean koosteen Discordiin, koska se kutsuu koko putken).
+Testaa `run_daily.sh` manuaalisesti terminaalissa ennen kuin ajastat sen (huom: se lähettää oikean koosteen Discordiin, koska se kutsuu koko putken) — ja testaa myös itse ajastusmekanismi kerran oikeasti lyhyellä, lähiajan `StartCalendarInterval`-arvolla ennen kuin luotat siihen päivittäin: kuten tämä koko osio osoittaa, interaktiivinen testi ei riitä paljastamaan ajastusympäristön omia ongelmia.
 
 ## Resurssit
 

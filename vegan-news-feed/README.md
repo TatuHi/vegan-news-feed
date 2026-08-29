@@ -10,7 +10,7 @@ Design rationale and iteration history: see [`PROCESS.md`](PROCESS.md). Full age
 
 Every script in this repository (`fetch_feeds.py`, `post_discord.py`, `history.py`, `run_daily.sh`) was written by Claude (an AI, via Claude Code), iteratively, as documented in `PROCESS.md`. **None of it has been independently reviewed by a human for correctness, security, or safety** — it has been tested for behavior (see `PROCESS.md`'s testing notes and `evals/`), which is not the same thing as a security or code review.
 
-If you clone and run this code — especially if you schedule it via cron, where it runs unattended with your credentials — **read it yourself first.** Don't run it blindly. The repository owner takes no responsibility for what happens if you do.
+If you clone and run this code — especially if you schedule it, where it runs unattended with your credentials — **read it yourself first.** Don't run it blindly. The repository owner takes no responsibility for what happens if you do.
 
 ## What it looks for
 
@@ -61,11 +61,9 @@ In Claude Code, ask something that matches `SKILL.md`'s trigger phrasing, e.g.:
 Claude Code should pick the skill up automatically from its description; no explicit slash command needed.
 
 **4. (Optional) Schedule it**
-`scripts/run_daily.sh` is a cron-safe wrapper — see "Reliability" below for exactly what it handles. Example crontab line (daily at 8 AM):
-```
-0 8 * * * /Users/<you>/.claude/skills/vegan-news-feed/scripts/run_daily.sh >> ~/Library/Logs/vegan-news-feed.log 2>&1
-```
-Test it manually once before adding it to cron — it sends a real digest, since it runs the whole pipeline.
+`scripts/run_daily.sh` is a schedule-safe wrapper — see "Reliability" below for exactly what it handles. **Use a macOS LaunchAgent, not cron**: cron is implemented as a system LaunchDaemon that doesn't run inside your GUI login session, so `claude`'s Keychain-based login isn't available to it — this was discovered the hard way via a real cron-triggered failure (`Not logged in`), documented in `PROCESS.md`'s iteration 6. Full LaunchAgent `.plist` template and `launchctl` commands: `SKILL.md`'s "Ajastaminen" section.
+
+Test `run_daily.sh` manually once before scheduling it — it sends a real digest, since it runs the whole pipeline — and test the scheduling mechanism itself once with a near-term time before trusting it daily, since (as this exact bug shows) an interactive test alone won't catch scheduling-environment-specific failures.
 
 ## Reliability & data integrity
 
@@ -77,7 +75,8 @@ This pipeline is meant to run unattended, so a fair amount of it is about failur
 - **Direct-link resolution**: Google News links are redirect URLs, not the real article — the skill resolves and uses the actual publisher URL in every sent message instead.
 - **Missed-run backfill**: cron doesn't wake a sleeping Mac, so a missed day leaves a real gap in the history. `history.py gaps` detects days with zero recorded activity, and a documented (on-demand, not automatic) backfill workflow can retroactively fill history for recent gaps — without necessarily posting a stale digest to Discord. Bounded by a real constraint: RSS feeds are rolling windows, so this only works reliably for gaps of roughly 1-5 days.
 - **Dual-channel failure alerting**: if a scheduled run fails for any reason, `run_daily.sh` posts a warning to the same Discord channel *and* fires an independent macOS notification — so a failure still surfaces even if the failure is Discord itself being unreachable.
-- **Environment fragility, solved once**: `run_daily.sh` points at a specific, known-working Python install and its SSL certs rather than trusting `PATH` (which, depending on the machine, may resolve to a Python too old for this codebase's syntax), and sends requests with a browser-like User-Agent (some hosts, including Discord's own webhook endpoint, block default script user-agents).
+- **Environment fragility, solved once**: `run_daily.sh` points at a specific, known-working Python install and its SSL certs, and at the `claude` CLI binary itself, rather than trusting `PATH` (which, depending on the machine or how it's invoked, may resolve to a Python too old for this codebase's syntax, or not find `claude` at all) — and sends requests with a browser-like User-Agent (some hosts, including Discord's own webhook endpoint, block default script user-agents).
+- **Scheduling mechanism matters, not just the script**: a real cron-triggered run (not just an interactive test) surfaced two failures an interactive test never would have — `claude` missing from cron's PATH, and, more fundamentally, `claude`'s Keychain-based login being unreachable from cron entirely (cron runs outside the GUI login session on macOS). The fix was switching to a macOS LaunchAgent, not cron. See `SKILL.md`'s "Ajastaminen" section and `PROCESS.md`'s iteration 6.
 
 Full detail on all of the above: `SKILL.md`'s "Puuttuvien päivien täyttäminen" and "Ajastaminen" sections, and `PROCESS.md`'s iteration history.
 

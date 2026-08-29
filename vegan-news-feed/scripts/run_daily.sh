@@ -69,9 +69,21 @@ export SSL_CERT_FILE
 SSL_CERT_FILE="$("$PYTHON311" -c 'import certifi; print(certifi.where())')"
 export PATH="/Library/Frameworks/Python.framework/Versions/3.11/bin:$PATH"
 
+# Sama luokan ongelma kuin PYTHON311:n kanssa, loydettiin vasta oikealla
+# cron-laukaisulla 2026-08-28 (exit 127, "claude: command not found") -
+# cronin suppea PATH ei sisalla ~/.local/bin:ia, missa claude CLI asuu
+# talla koneella. Interaktiiviset ajot eivat koskaan paljastaneet tata,
+# koska oma shell loytaa sen aina. Kaytetaan siis suoraa polkua, ei PATH:ia.
+CLAUDE_BIN="$HOME/.local/bin/claude"
+if [ ! -x "$CLAUDE_BIN" ]; then
+  echo "[run_daily.sh] claude-komentoa ei loydy polusta $CLAUDE_BIN" >&2
+  notify_failure 1
+  exit 1
+fi
+
 cd "$HOME/.claude/skills/vegan-news-feed"
 
 # Ei "exec" tassa: trap ERR ei laukeaisi enaa taman prosessin jalkeen, jos
 # claude korvaisi koko shell-prosessin.
-claude -p "Aja vegan-news-feed-skilli ja lähetä tämän päivän koonti Discordiin" \
+"$CLAUDE_BIN" -p "Aja vegan-news-feed-skilli ja lähetä tämän päivän koonti Discordiin" \
   --allowedTools "Bash,Read,Write,WebFetch,WebSearch"

@@ -6,7 +6,7 @@ A companion [Claude Code](https://claude.com/claude-code) skill that reviews its
 
 `scripts/run_weekly_review.sh` was written by Claude (an AI, via Claude Code), iteratively, as documented in [`../vegan-news-feed/PROCESS.md`](../vegan-news-feed/PROCESS.md). **It has not been independently reviewed by a human for correctness, security, or safety.**
 
-If you clone and run this code — especially if you schedule it via cron, where it runs unattended with your credentials — **read it yourself first.** Don't run it blindly. The repository owner takes no responsibility for what happens if you do.
+If you clone and run this code — especially if you schedule it, where it runs unattended with your credentials — **read it yourself first.** Don't run it blindly. The repository owner takes no responsibility for what happens if you do.
 
 ## What it does
 
@@ -28,11 +28,7 @@ No separate configuration needed — it reuses `vegan-news-feed`'s existing `~/.
 ```
 or just ask Claude Code directly: "aja vegan-news-feedin viikkokatsaus" / "arvioi vegan-news-feedin toimintaa".
 
-**Or schedule it** (optional — it's fully useful without ever being scheduled):
-```
-0 20 * * 0 /Users/<you>/.claude/skills/vegan-news-feed-review/scripts/run_weekly_review.sh >> ~/Library/Logs/vegan-news-feed-review.log 2>&1
-```
-(Sundays at 20:00, as an example — adjust to taste.)
+**Or schedule it** (optional — it's fully useful without ever being scheduled): use a macOS LaunchAgent, not cron. `vegan-news-feed`'s `SKILL.md` "Ajastaminen" section has the full `.plist` template and explains why cron specifically doesn't work here (its `claude` login can't reach macOS Keychain from a cron-triggered process) — the same template applies to this script, just pointing at `run_weekly_review.sh` with whatever `StartCalendarInterval` you want (e.g. Sundays at 20:00).
 
 ## Repo layout
 
