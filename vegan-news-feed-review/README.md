@@ -28,7 +28,7 @@ No separate configuration needed — it reuses `vegan-news-feed`'s existing `~/.
 ```
 or just ask Claude Code directly: "aja vegan-news-feedin viikkokatsaus" / "arvioi vegan-news-feedin toimintaa".
 
-**Or schedule it** (optional — it's fully useful without ever being scheduled): use a macOS LaunchAgent, not cron. `vegan-news-feed`'s `SKILL.md` "Ajastaminen" section has the full `.plist` template and explains why cron specifically doesn't work here (its `claude` login can't reach macOS Keychain from a cron-triggered process) — the same template applies to this script, just pointing at `run_weekly_review.sh` with whatever `StartCalendarInterval` you want (e.g. Sundays at 20:00).
+**Or schedule it** (optional — it's fully useful without ever being scheduled): use a macOS LaunchAgent, not cron. `vegan-news-feed`'s `SKILL.md` "Ajastaminen" section has the full `.plist` template and explains why cron specifically doesn't work here (its `claude` login can't reach macOS Keychain from a cron-triggered process) — the same template applies to this script, just pointing at `run_weekly_review.sh` with whatever `StartCalendarInterval` you want. On the machine this was developed on, it's scheduled for Sundays at 13:15 (see `PROCESS.md`'s iteration 7 addendum) — the `.plist` itself lives at `~/Library/LaunchAgents/`, outside this repo, since it's per-machine configuration, not code.
 
 ## Repo layout
 
