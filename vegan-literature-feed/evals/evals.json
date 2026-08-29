@@ -1,0 +1,29 @@
+{
+  "skill_name": "vegan-literature-feed",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Aja vegan-literature-feed-skilli ja tee tämän viikon kirjallisuuskooste Discordiin.",
+      "expected_output": "Skilli hakee PubMedista tuoreet artikkelit fetch_pubmed.py:llä, tekee 1-3 kohdennettua WebSearch-hakua maatalous-/ympäristö-/politiikka-aukon täyttämiseksi, arvioi relevanssin ja tieteellisen painoarvon harkiten (ei kaikkea läpi), kirjoittaa suomenkieliset yhteenvedot tutkimustyyppi- ja varausmerkintöineen, muotoilee viestin annetulla pohjalla, ja lähettää sen onnistuneesti webhookiin. Jos ei relevantteja tuloksia, lähettää lyhyen 'ei merkittävää uutta tutkimusta' -viestin sen sijaan että keksisi jotain.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "PubMedista löytyi tällä viikolla systemaattinen katsaus (pub_types sisältää 'Systematic Review') kasvipohjaisen ruokavalion vaikutuksesta sydän- ja verisuonitauteihin, mutta ei yhtään uutta alkuperäistutkimusta samasta aiheesta.",
+      "expected_output": "Skilli EI ohita katsausartikkelia sillä perusteella ettei se ole 'uusi löydös' — se arvioi sen oman kriteeristönsä mukaan (kokoaako se hyödyllisen laajemman kuvan aihepiiristä) ja sisällyttää sen koosteeseen jos näin on, merkiten tutkimustyypin selvästi 'Systemaattinen katsaus' -tunnisteella yhteenvedossa (vaihe 3).",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Yksi PubMedista löytynyt alkuperäistutkimus on eläinkoe (esim. jyrsijämalli) jonka tulosta media saattaisi houkutella yleistämään suoraan ihmisiin.",
+      "expected_output": "Skilli sisällyttää tutkimuksen mahdollisesti koosteeseen jos se muuten on kiinnostava, mutta yhteenvedossa mainitaan selvästi varauksena että kyseessä on eläinkoe eikä tulosta pidä suoraan yleistää ihmisiin (vaihe 3 'Varaus/rajoitus'). Vaiheen 4 julkaisukulmassa ei ehdoteta kulmaa joka esittäisi tuloksen suoraan ihmissovelluksena ilman tätä varausta.",
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "Yksi kohdennetun WebSearch-haun (eläinmaatalouden ympäristövaikutus) tulos osoittautuu olevan julkaisematon working paper / preprint-palvelimella (ei vertaisarvioitu).",
+      "expected_output": "Skilli jättää tämän kohteen kokonaan pois koosteesta 'Vertaisarvioitu vain' -säännön mukaisesti, eikä yritä sisällyttää sitä edes varauksella merkittynä. PubMed-lähteisiä kohteita ei tarvitse tarkistaa tältä osin erikseen (PubMed ei indeksoi preprinttejä), mutta WebSearch-kohteet vaativat tämän tarkistuksen aina.",
+      "files": []
+    }
+  ]
+}
