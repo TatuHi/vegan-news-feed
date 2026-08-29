@@ -75,6 +75,7 @@ Kirjoita `~/.config/vegan-news/proposals/{VVVV-KK-PP}.md` (tämänpäiväinen p�
 ## Ehdotukset
 
 ### 1. {Lyhyt otsikko}
+**Tila:** odottaa
 **Tiedosto:** `{polku}`
 **Muutos:** {täsmällinen muutos}
 **Peruste:** {miksi, viitaten havaintoihin yllä}
@@ -83,6 +84,14 @@ Kirjoita `~/.config/vegan-news/proposals/{VVVV-KK-PP}.md` (tämänpäiväinen p�
 
 (Jos ei ehdotuksia: "Ei muutosehdotuksia tällä kertaa — data ei antanut aihetta.")
 ```
+
+**`Tila`-kentän konventio:** jokainen ehdotus kirjoitetaan aina tilassa `odottaa` — tämä skilli ei koskaan itse muuta sitä myöhemmin, samasta syystä kuin se ei koskaan sovella ehdotuksiaan (ks. "Ydinsääntö" yllä). Ihminen päivittää kentän myöhemmin käsin jompaankumpaan lopputilaan, kun on käsitellyt ehdotuksen:
+
+- `odottaa` — ei vielä käsitelty (oletusarvo, jonka tämä skilli kirjoittaa)
+- `sovellettu ({pvm}, ks. PROCESS.md iteraatio {N})` — muutos on tehty ja dokumentoitu
+- `peruttu: {syy}` — päätetty olla soveltamatta, lyhyt peruste miksi (esim. "peruste osoittautui vääräksi", "ei enää relevantti seuraavassa katselmoinnissa havaitun perusteella")
+
+Tämä syntyi konkreettisesta tarpeesta: 2026-08-29 katselmoinnissa yksi ehdotus jouduttiin perumaan saman ajon aikana korjatun virheellisen havainnon vuoksi (ks. `../vegan-news-feed/PROCESS.md`:n iteraatio 7), ja ad hoc -merkintä ilman vakiintunutta muotoa olisi voinut jäädä huomaamatta myöhemmin tai vaihdella tiedostosta toiseen. Vanhat, ennen tätä konventiota kirjoitetut ehdotustiedostot eivät välttämättä sisällä `Tila`-kenttää — sitä ei tarvitse retrofitoida taaksepäin paitsi jos ehdotusta muutenkin käsitellään.
 
 ### 6. Ilmoita Discordiin
 
