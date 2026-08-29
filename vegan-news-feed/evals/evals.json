@@ -18,6 +18,48 @@
       "prompt": "Onko tänään mitään sellaista vegaaniuutista josta olisi hyvä tehdä oma some-postaus?",
       "expected_output": "Skilli suorittaa haun ja relevanssiarvion, mutta painottaa vastauksessaan nimenomaan vaiheen 4 sisältöideaosiota (kulma + miksi juuri nyt) sen sijaan että listaisi vain kaikki uutiset tasapuolisesti. Jos mikään ei anna hyvää lähtökohtaa, sanoo niin suoraan sen sijaan että pakottaa ehdotuksen.",
       "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "Aja vegan-news-feed-skilli tänään. Lähetyshistoriassa (~/.config/vegan-news/sent_history.json) on jo eiliseltä merkintä uutisesta 'EU-parlamentti äänesti turkistarhauskiellosta' (sama linkki, sama lähde), eikä asiaan ole tullut mitään uutta käännettä sen jälkeen. Tämänpäiväisessä raakadatassa sama tarina esiintyy uudelleen, samasta lähteestä, koska se on yhä 30h-hakuikkunan sisällä.",
+      "expected_output": "Skilli ajaa history.py show --days 5 ennen vaiheen 2 valintaa, tunnistaa eilen lähetetyn saman tarinan (sama tapahtuma, ei uutta käännettä), ja jättää sen tämän päivän koosteesta pois duplikaattina sen sijaan että lähettäisi sen uudelleen. Jos raakadatassa olisi sen sijaan aidosti uusi käänne samaan aiheeseen (esim. tuomioistuimen päätös aiemmin uutisoituun kanteeseen), skilli sisällyttäisi sen omana uutisenaan eikä hylkäisi sitä pelkän aihe-yhteyden perusteella.",
+      "files": []
+    },
+    {
+      "id": 5,
+      "prompt": "Aja tämän päivän uutiskooste. Yksi vaiheessa 2 valituista uutisista tulee Google Newsin RSS-syötteestä, ja sen raakadatan link-kenttä on muotoa https://news.google.com/rss/articles/... (Googlen välityslinkki, ei alkuperäisen julkaisijan sivu).",
+      "expected_output": "Skilli ei käytä Google Newsin uudelleenohjauslinkkiä sellaisenaan lopullisessa Discord-viestissä. Se selvittää WebFetch- tai WebSearch-työkalulla alkuperäisen julkaisijan suoran URL:n vaiheen 3 rikastuksen yhteydessä ja käyttää sitä 🔗-linkkinä viestissä. Jos suoraa linkkiä ei mistään syystä löydy, se käyttää Google News -linkkiä varapolkuna sen sijaan että jättäisi linkin kokonaan pois.",
+      "files": []
+    },
+    {
+      "id": 6,
+      "prompt": "Aja fetch_feeds.py suoraan (python3 scripts/fetch_feeds.py --hours 48 --output /tmp/test_raw.json) ja tarkista tulostetusta JSON:sta: jos sama tarina on julkaistu sekä alkuperäisen lähteen omassa RSS-syötteessä että Google Newsin republish-versiona (jonka otsikossa on tyypillisesti '- Julkaisijan nimi' -pääte), esiintyykö se tuloksessa kahteen kertaan?",
+      "expected_output": "fetch_feeds.py:n oma normalize_title()/dedupe()-mekanismi tunnistaa nämä kahdeksi eri raa'aksi RSS-kohteeksi samasta tarinasta (normalisoidun otsikon ja lähteen perusteella, '- Julkaisija'-pääte tunnistettu ja poistettu vertailusta), ja lopullinen JSON sisältää vain yhden kohteen — version jolla on suora linkki ja kunnollinen kuvaus (_item_quality-vertailu ratkaisee kumpi säilyy), ei molempia. Tämä tapahtuu skriptitasolla ennen kuin agentti näkee datan, joten agentin ei tarvitse eikä pidä yrittää tunnistaa tätä täsmällistä duplikaattityyppiä itse — vain sanamuodoltaan kokonaan erilaisia, eri julkaisijan itse kirjoittamia kuvauksia samasta tapahtumasta jää sen harkintaan (ks. eval 4).",
+      "files": []
+    },
+    {
+      "id": 7,
+      "prompt": "Tämänpäiväisessä raakadatassa on mm. SEY:n (sey.fi) RSS-syötteestä otsikko 'Löytökissa Miu sai vihdoin ikiomat ihmiset' — yksittäinen lemmikin-/pelastuseläintarina ilman poliittista tai yhteiskunnallista ulottuvuutta.",
+      "expected_output": "Skilli jättää tämän uutisen pois lopullisesta koosteesta vaiheen 2 'Jätä pois' -säännön mukaisesti, vaikka lähde (SEY) on muuten hyväksytty ja luotettava eläinoikeusjärjestö feeds.md:ssä. Sitä ei sisällytetä 8–10 kärkiuutisen joukkoon pelkän lähteen perusteella — sisällön, ei lähteen, pitää ratkaista.",
+      "files": []
+    },
+    {
+      "id": 8,
+      "prompt": "Aja tämän päivän uutiskooste tilanteessa jossa yksikään haetuista kohteista ei täytä relevanssikriteerejä (kaikki reseptejä, mainoksia tai ohimeneviä mainintoja).",
+      "expected_output": "Skilli lähettää lyhyen 'Ei merkittäviä uutisia tänään' -viestin Discordiin (vaihe 5), mutta tallentaa silti vaiheen 7 historian: history.py record -kutsu tehdään yhdellä {\"type\": \"run\", \"result\": \"no_news\", \"item_count\": 0} -kohteella, ei jätetä koko tallennusaskelta väliin vain koska uutisia ei ollut. Ilman tätä history.py gaps ei voisi erottaa tätä päivää päivästä jolloin ajo ei käynnistynyt lainkaan.",
+      "files": []
+    },
+    {
+      "id": 9,
+      "prompt": "Käyttäjä pyytää: 'Tarkista onko ajoja jäänyt välistä viimeisen kahden viikon aikana, ja täytä puuttuvat päivät historiaan.' history.py gaps --days 14 löytää kaksi puuttuvaa päivää noin viikko sitten (esim. kone oli sammuksissa cronin ajan).",
+      "expected_output": "Skilli ajaa ensin history.py gaps --days 14 löytääkseen puuttuvat päivät, hakee riittävän laajan aikaikkunan fetch_feeds.py:llä kattamaan vanhimman aukon, ryhmittelee tuloksen published-kentän (ei hakuhetken) mukaan oikeille kalenteripäiville, tekee jokaiselle puuttuvalle päivälle erikseen vaiheiden 2–3 relevanssiarvion ja tiivistelmät (EI vaihetta 4, sisältöideat), EI lähetä mitään Discordiin oletuksena koska päivät ovat jo menneet, ja tallentaa jokaisen puuttuvan päivän historiaan oikealla --date-arvolla niin että jokainen kohde (myös run-merkintä) on merkitty \"backfilled\": true. Jos jollekin päivälle ei löydy mitään dataa RSS:n liukuvan ikkunan takia, tallentaa silti run-merkinnän {\"result\": \"unrecoverable\", \"backfilled\": true} sen sijaan että jättäisi päivän hiljaa avoimeksi.",
+      "files": []
+    },
+    {
+      "id": 10,
+      "prompt": "Viimeisen kolmen päivän historiassa (history.py show --days 5) on kolme peräkkäistä rahoituskierrosuutista eikä yhtään tutkimus- tai politiikka-aiheista uutista. Tämänpäiväisessä raakadatassa on yhdeksän relevanttia ehdokasta kymmenennelle (viimeiselle) paikalle: kahdeksan ensimmäistä ovat selvästi vahvoja/merkittäviä, mutta yhdeksäs ja kymmenes ehdokas ovat keskenään suunnilleen yhtä merkittäviä muuten — toinen on jälleen rahoituskierrosuutinen, toinen EU-tason eläinsuojelupolitiikkauutinen.",
+      "expected_output": "Skilli käyttää aihetason tasapainoa tiebreakerina vain kahden muuten samanarvoisen ehdokkaan välillä viimeisestä paikasta päättäessään: valitsee EU-politiikkauutisen rahoituskierrosuutisen sijaan, koska se tuo digestiin jotain viime päivinä näkymätöntä. Se ei kuitenkaan hylkää mitään yksinään aidosti merkittävää uutista pelkän aihetoiston perusteella (esim. jos joku kahdeksasta ensimmäisestä olisikin ollut rahoituskierros, se pysyy mukana) — tasapaino vaikuttaa vain tasavertaisten ehdokkaiden viimeiseen sijaan.",
+      "files": []
     }
   ]
 }
