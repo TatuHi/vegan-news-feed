@@ -10,7 +10,7 @@ If you clone and run this code — especially if you schedule it, where it runs 
 
 ## What it does
 
-Reads the send history `vegan-news-feed` accumulates (`~/.config/vegan-news/sent_history.json` — what was actually sent, from where, and the real summary/content-idea text, not just headlines), looks for concrete patterns over the review window (default: last 7 days) — sources that never contribute, thin or repetitive summaries, content ideas that feel forced, coverage gaps, and run-outcome patterns (how many days had no relevant news at all, any backfilled or unrecoverable gaps) — and writes a dated, specific proposal file to `vegan-news-feed/proposals/`. It then posts a short Discord notification pointing to it.
+Reads the send history `vegan-news-feed` accumulates (`~/.config/vegan-news/sent_history.json` — what was actually sent, from where, and the real summary/content-idea text, not just headlines), looks for concrete patterns over the review window (default: last 7 days) — sources that never contribute, thin or repetitive summaries, content ideas that feel forced, coverage gaps, and run-outcome patterns (how many days had no relevant news at all, any backfilled or unrecoverable gaps) — and writes a dated, specific proposal file to `~/.config/vegan-news/proposals/` (see [`../vegan-news-feed/DATA_LOCATIONS.md`](../vegan-news-feed/DATA_LOCATIONS.md) for why it lives there and not inside either skill folder). It then posts a short Discord notification pointing to it.
 
 **It never edits `vegan-news-feed`'s own files.** Applying a proposal is always a separate, human-initiated step — you read the proposal, decide, and either apply it yourself or ask Claude Code to apply a specific one interactively. This mirrors how every change to `vegan-news-feed` has actually been made: propose, explain the reasoning, human approves, then it's applied and documented in `PROCESS.md`.
 
@@ -37,11 +37,11 @@ SKILL.md                    Agent instructions
 scripts/run_weekly_review.sh  Cron-safe wrapper, also runnable manually anytime
 ```
 
-Proposals it produces live in `../vegan-news-feed/proposals/`, not here — they're about that skill, so they sit next to what they propose to change.
+Proposals it produces live in `~/.config/vegan-news/proposals/`, not in this repo at all — see [`../vegan-news-feed/DATA_LOCATIONS.md`](../vegan-news-feed/DATA_LOCATIONS.md) for why (files inside `~/.claude/skills/` are treated as "sensitive" by Claude Code and block unattended writes).
 
 ## Example output
 
-The first real run (2026-08-26) is preserved as-is at [`../vegan-news-feed/proposals/2026-08-26.md`](../vegan-news-feed/proposals/2026-08-26.md) — it correctly found only one day of thin, pre-schema-change history and reported honestly that there wasn't enough data to review yet, rather than inventing findings. A more typical proposal, once real week-over-week data exists, will look like the template in `SKILL.md`'s step 5: dated observations plus concrete, file-and-line-specific suggestions.
+The first real run (2026-08-26) found only one day of thin, pre-schema-change history and reported honestly that there wasn't enough data to review yet, rather than inventing findings. The second real run (2026-08-29), with a genuine week of history, produced a proposal with actual findings and suggestions — and also a good demonstration of why proposals need human review before being trusted: it initially misattributed a data gap to the wrong cause (a scheduling bug, when the real cause was simply that data collection hadn't started yet), which the human reviewer caught and corrected. Both are preserved at `~/.config/vegan-news/proposals/` on the machine they ran on (not in this repo — see `DATA_LOCATIONS.md`). A typical proposal follows the template in `SKILL.md`'s step 5: dated observations plus concrete, file-and-line-specific suggestions.
 
 ## Platform support
 

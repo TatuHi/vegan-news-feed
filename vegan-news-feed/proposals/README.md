@@ -1,16 +1,16 @@
-# Ehdotukset
+# Ehdotukset — eivät enää täällä
 
-Tämän kansion tiedostot on kirjoittanut `vegan-news-feed-review`-skilli, ei
-`vegan-news-feed` itse eikä sen käyttäjä suoraan. Jokainen tiedosto on yksi
-viikkokatsauksen tuottama muutosehdotus (esim. lähteen lisäys/poisto,
-relevanssikriteerin hionta) perusteluineen, poimittu oikeasta
-lähetyshistoriasta.
+Ehdotustiedostot (jotka `vegan-news-feed-review`-skilli kirjoittaa) eivät
+enää elä tässä kansiossa. Ne siirrettiin `~/.config/vegan-news/proposals/`
+-kansioon 2026-08-29 (ks. `../PROCESS.md`:n iteraatio 7), koska tämän
+hakemiston sisällä olevat tiedostot lasketaan Claude Codessa
+"sensitive file" -kategoriaan, mikä estää Write-työkalua kirjoittamasta
+tänne ilman ihmisen läsnäoloa hyväksymässä sitä — tarkoittaen että
+ajastettu/ajastamaton `vegan-news-feed-review`-ajo ei olisi koskaan
+voinut valmistua loppuun asti tämän kansion sisällä.
 
-Nimeämiskäytäntö: `VVVV-KK-PP.md` (katsauksen ajopäivä).
+Katso `../DATA_LOCATIONS.md` täydellinen lista kaikesta mikä elää
+skillikansion ulkopuolella ja miksi.
 
-**Mikään tässä kansiossa ei ole vielä sovellettu.** Ehdotuksen soveltaminen
-tarkoittaa aina ihmisen erikseen pyytämää, interaktiivista muokkausta
-`../SKILL.md`:hen tai `../references/feeds.md`:hen — `vegan-news-feed-review`
-ei koskaan muokkaa niitä itse. Kun ehdotus hyväksytään ja sovelletaan,
-päätös ja perustelu kirjataan `../PROCESS.md`:hen uutena iteraationa; itse
-ehdotustiedosto voi jäädä tähän historiaksi siitä mitä harkittiin.
+Tämä kansio ja tiedosto jäävät tänne tarkoituksella tyhjänä
+opasteena — jos joku etsii ehdotuksia täältä, tämä kertoo minne mennä.

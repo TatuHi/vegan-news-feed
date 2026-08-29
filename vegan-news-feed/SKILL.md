@@ -252,11 +252,12 @@ Testaa `run_daily.sh` manuaalisesti terminaalissa ennen kuin ajastat sen (huom: 
 - `scripts/post_discord.py` — lähettää viestin webhookiin, pilkkoo pitkät viestit
 - `scripts/history.py` — pitää kirjaa lähetetyistä uutisista JA sisältöideoista (`~/.config/vegan-news/sent_history.json`) cross-day-dedupointia varten; `show` lukee historian, `record` tallentaa päivän lähetykset (`--date` mahdollistaa jälkikäteisen tallennuksen/backfillin) ja siivoaa yli 30 vrk vanhat pois, `gaps` listaa päivät joilta puuttuu jokainen merkintä (ohitetut ajot). **Sama tiedosto ja scripti on myös `vegan-news-feed-review`-sisarskillin datalähde** — siksi vaiheessa 7 tallennetaan oikea sisältö (tiivistelmät, kulmat), ei vain otsikkoja.
 - `scripts/run_daily.sh` — cron-wrapper: lukee webhookin `~/.config/vegan-news/.env`-tiedostosta, asettaa oikean Python-polun/SSL-varmenteet, ajaa `claude -p`:n ja hälyttää Discordiin jos ajo epäonnistuu
-- `proposals/` — `vegan-news-feed-review`-skillin kirjoittamia muutosehdotuksia (ei koskaan tämän skillin itsensä kirjoittamia) — ks. `../vegan-news-feed-review/SKILL.md`
+- `proposals/` — ei enää sisällä ehdotustiedostoja itse, vain opastekirjoitus (`README.md`) siitä että ne siirtyivät `~/.config/vegan-news/proposals/`-kansioon (ks. `DATA_LOCATIONS.md`) — ks. myös `../vegan-news-feed-review/SKILL.md`
 - `references/feeds.md` — lähdelistaus; muokkaa/laajenna vapaasti
 - `evals/evals.json` — testipromptit skillin toiminnan tarkistamiseen (ks. skill-creator-työnkulku)
 - `PROCESS.md` — dokumentaatio siitä miten tämä skilli suunniteltiin ja miksi (intent → draft → testaus → iterointi); hyödyllinen jos näytät tämän projektin osana hakemusta tai portfoliota
+- `DATA_LOCATIONS.md` — kartta kaikesta datasta joka elää `~/.config/vegan-news/`-kansiossa skillikansion ulkopuolella (webhook-secret, lähetyshistoria, ehdotukset) ja miksi
 
 ## Sisarskilli: vegan-news-feed-review
 
-Erillinen skilli `vegan-news-feed-review` (rinnakkaisessa kansiossa `~/.claude/skills/vegan-news-feed-review/`) lukee tämän skillin lähetyshistoriaa viikoittain ja ehdottaa parannuksia (esim. lähteiden lisäys/poisto, relevanssikriteerien hionta) — mutta EI KOSKAAN muokkaa tämän skillin tiedostoja itse. Se kirjoittaa ehdotukset `proposals/`-kansioon, ja ihminen hyväksyy/soveltaa ne erikseen. Ks. sen oma SKILL.md ja `PROCESS.md`:n iteraatio 4 -osio.
+Erillinen skilli `vegan-news-feed-review` (rinnakkaisessa kansiossa `~/.claude/skills/vegan-news-feed-review/`) lukee tämän skillin lähetyshistoriaa viikoittain ja ehdottaa parannuksia (esim. lähteiden lisäys/poisto, relevanssikriteerien hionta) — mutta EI KOSKAAN muokkaa tämän skillin tiedostoja itse. Se kirjoittaa ehdotukset `~/.config/vegan-news/proposals/`-kansioon (ei tämän skillin sisälle — ks. `DATA_LOCATIONS.md` miksi), ja ihminen hyväksyy/soveltaa ne erikseen. Ks. sen oma SKILL.md ja `PROCESS.md`:n iteraatio 4 -osio.

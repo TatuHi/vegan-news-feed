@@ -1,13 +1,13 @@
 ---
 name: vegan-news-feed-review
-description: Viikoittainen (tai pyydettäessä muulloinkin ajettava) itsearviointi vegan-news-feed-skillille. Lukee sisarskilliin `vegan-news-feed` kertyneen lähetyshistorian (mitä uutisia ja sisältöideoita on oikeasti lähetetty, mistä lähteistä, kuinka usein), analysoi toistuvia laatuongelmia tai puutteita, ja kirjoittaa konkreettisia, perusteltuja muutosehdotuksia (esim. lähteen lisäys/poisto feeds.md:hen, relevanssikriteerin hionta SKILL.md:hen) tiedostoon `vegan-news-feed/proposals/`. Ei KOSKAAN muokkaa vegan-news-feedin omia tiedostoja itse — ehdotukset vaativat aina ihmisen hyväksynnän ja soveltamisen erikseen. Käytä tätä skilliä kun käyttäjä pyytää arvioimaan/katselmoimaan/parantamaan vegan-news-feed-skilliä, tekemään viikkokatsauksen, tarkistamaan onko lähteissä tai relevanssissa parannettavaa, tai lyhyillä komennoilla kuten "aja viikkokatsaus", "arvioi vegan-news-feedin toimintaa" tai "onko vegan-news-feediin parannusehdotuksia".
+description: Viikoittainen (tai pyydettäessä muulloinkin ajettava) itsearviointi vegan-news-feed-skillille. Lukee sisarskilliin `vegan-news-feed` kertyneen lähetyshistorian (mitä uutisia ja sisältöideoita on oikeasti lähetetty, mistä lähteistä, kuinka usein), analysoi toistuvia laatuongelmia tai puutteita, ja kirjoittaa konkreettisia, perusteltuja muutosehdotuksia (esim. lähteen lisäys/poisto feeds.md:hen, relevanssikriteerin hionta SKILL.md:hen) tiedostoon `~/.config/vegan-news/proposals/`. Ei KOSKAAN muokkaa vegan-news-feedin omia tiedostoja itse — ehdotukset vaativat aina ihmisen hyväksynnän ja soveltamisen erikseen. Käytä tätä skilliä kun käyttäjä pyytää arvioimaan/katselmoimaan/parantamaan vegan-news-feed-skilliä, tekemään viikkokatsauksen, tarkistamaan onko lähteissä tai relevanssissa parannettavaa, tai lyhyillä komennoilla kuten "aja viikkokatsaus", "arvioi vegan-news-feedin toimintaa" tai "onko vegan-news-feediin parannusehdotuksia".
 ---
 
 # Vegan News Feed — Review
 
 Tämä skilli on `vegan-news-feed`-skillin **katselmoija**, ei sen tuottaja. Sillä on täysin eri vastuu ja eri kadenssi (viikoittainen tai tarpeen mukaan, ei päivittäinen), ja siksi se on tarkoituksella oma erillinen skillinsä eikä osa `vegan-news-feed`:iä — ks. `vegan-news-feed/PROCESS.md`:n iteraatio 4 -osio miksi tämä arkkitehtuurivalinta tehtiin.
 
-**Ydinsääntö, josta ei jousteta:** tämä skilli lukee `vegan-news-feed`-hakemiston tiedostoja, mutta **ei koskaan kirjoita tai muokkaa niitä**. Se kirjoittaa vain omaan `proposals/`-kansioonsa. Muutosten soveltaminen `SKILL.md`:hen tai `feeds.md`:hen on aina erillinen, ihmisen pyytämä, interaktiivinen toimenpide — ei jotain minkä tämä skilli tekee osana ajoaan, ei edes jos ehdotus vaikuttaa ilmiselvältä.
+**Ydinsääntö, josta ei jousteta:** tämä skilli lukee `vegan-news-feed`-hakemiston tiedostoja, mutta **ei koskaan kirjoita tai muokkaa niitä**. Se kirjoittaa vain `~/.config/vegan-news/proposals/`-kansioon — tarkoituksella skillikansion ulkopuolelle, koska `~/.claude/skills/`-hakemiston sisällä olevat tiedostot lasketaan Claude Codessa "sensitive file" -kategoriaan, mikä estäisi Write-työkalua kirjoittamasta sinne ilman ihmisen läsnäoloa hyväksymässä sitä (ks. `../vegan-news-feed/DATA_LOCATIONS.md`). Muutosten soveltaminen `SKILL.md`:hen tai `feeds.md`:hen on aina erillinen, ihmisen pyytämä, interaktiivinen toimenpide — ei jotain minkä tämä skilli tekee osana ajoaan, ei edes jos ehdotus vaikuttaa ilmiselvältä.
 
 ## Riippuvuus
 
@@ -58,7 +58,7 @@ Jos tarkastelujakson data ei anna aihetta mihinkään muutokseen, se on täysin 
 
 ### 5. Tallenna ehdotus
 
-Kirjoita `~/.claude/skills/vegan-news-feed/proposals/{VVVV-KK-PP}.md` (tämänpäiväinen päivämäärä), tätä pohjaa käyttäen:
+Kirjoita `~/.config/vegan-news/proposals/{VVVV-KK-PP}.md` (tämänpäiväinen päivämäärä), tätä pohjaa käyttäen:
 
 ```
 # Viikkokatsaus – {pp.kk.vvvv}
@@ -96,7 +96,7 @@ Viesti on lyhyt, ei koko ehdotus:
 
 ```
 📋 **Viikkokatsaus valmis – {pp.kk.vvvv}**
-{N} ehdotusta tarkastettavaksi: `vegan-news-feed/proposals/{VVVV-KK-PP}.md`
+{N} ehdotusta tarkastettavaksi: `~/.config/vegan-news/proposals/{VVVV-KK-PP}.md`
 ```
 
 Jos ehdotuksia ei ollut, lähetä silti lyhyt vahvistus ("📋 Viikkokatsaus tehty, ei muutosehdotuksia") — sama periaate kuin `vegan-news-feed`:n "ei uutisia tänään" -viestissä: näet putken toimivan myös silloin kun mitään ei tapahdu.

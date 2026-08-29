@@ -89,5 +89,21 @@ cd "$HOME/.claude/skills/vegan-news-feed-review"
 # Ei "exec" tassa: trap ERR ei laukeaisi enaa taman prosessin jalkeen.
 # Ei tarvita WebFetch/WebSearch-oikeuksia - taama skilli ei hae ulkoista
 # dataa, vain lukee vegan-news-feedin paikallista historiaa ja tiedostoja.
+#
+# --add-dir tarvitaan kahdesta erillisesta syysta:
+# 1. cwd on tama skilli (vegan-news-feed-review), mutta history.py/feeds.md
+#    luetaan sisarskillin (vegan-news-feed) kansiosta. Loytyi ensimmaisella
+#    oikealla ajolla 2026-08-29.
+# 2. Ehdotustiedosto kirjoitetaan ~/.config/vegan-news/proposals/-kansioon,
+#    EI enaa vegan-news-feedin sisalle - koska ~/.claude/skills/-hakemiston
+#    sisalla olevat tiedostot lasketaan Claude Codessa "sensitive file"
+#    -kategoriaan, mika estaa Write-tyokalua kirjoittamasta sinne ilman
+#    ihmisen lasnaoloa hyvaksymassa sita. Taman huomasi vasta samalla
+#    2026-08-29 ajolla, kun ensimmainen --add-dir-korjaus ei riittanytkaan:
+#    headless-istunto ei voinut kysya lupaa keneltakaan skillikansion
+#    sisalle kirjoittamiseen, joten se olisi jaanyt aina kesken ajastettuna.
+#    Ks. ../../vegan-news-feed/DATA_LOCATIONS.md taydelle selitykselle.
 "$CLAUDE_BIN" -p "Aja vegan-news-feed-review-skilli ja tee viikkokatsaus vegan-news-feedin viimeisen viikon toiminnasta" \
-  --allowedTools "Bash,Read,Write"
+  --allowedTools "Bash,Read,Write" \
+  --add-dir "$HOME/.claude/skills/vegan-news-feed" \
+  --add-dir "$HOME/.config/vegan-news"

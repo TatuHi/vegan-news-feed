@@ -12,7 +12,8 @@ Relationship to the other docs: `PROCESS.md` documents what was decided and why,
 
 ## vegan-news-feed-review
 
-- **Never actually run against a real week of rich-schema data yet.** The only real run so far (2026-08-26) hit the "history too thin, don't fabricate findings" branch — correct behavior, but the actual pattern-analysis logic (source contribution counts, summary-quality judgment, content-idea genuineness) has not yet been exercised against real multi-day, rich-schema (`summary`/`source`-populated) history. Revisit once `vegan-news-feed` has accumulated roughly a week of runs under the current schema.
+- (Resolved 2026-08-29, kept for context) Two bugs surfaced on the first real week-of-data run: a cross-directory Write needing `--add-dir`, and — more fundamentally — files inside `~/.claude/skills/` being treated as "sensitive" by Claude Code, blocking Write without a human present. Fixed by moving `proposals/` output to `~/.config/vegan-news/proposals/` and adding a second `--add-dir` to `run_weekly_review.sh`; verified with a real headless Write test (`exit 0`). See `PROCESS.md` iteration 7.
+- **This skill has still never run on an actual LaunchAgent schedule.** Everything so far (both real runs, 2026-08-26 and 2026-08-29) was triggered manually/headlessly by a human, not by a live `launchctl`-triggered timer, unlike `vegan-news-feed` which had its scheduling mechanism itself verified via a real timed trigger (`PROCESS.md` iteration 6). If this skill is ever scheduled, apply the same discipline: test the LaunchAgent trigger itself with a near-term time before trusting a weekly cadence.
 
 ## Cross-cutting / meta
 
