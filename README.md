@@ -1,6 +1,6 @@
 # AI Media Monitoring for Vegan/Animal-Rights Communications
 
-Three connected AI automations, built with [Claude Code](https://claude.com/claude-code), that act as a media-monitoring desk for a small comms team working in the vegan/plant-based and animal-rights space. Each one runs on a schedule, does real work unattended, and posts its output to a live Discord channel — this isn't a demo or a proof of concept, it's been running daily in production since late August 2026.
+Three connected AI automations, built with [Claude Code](https://claude.com/claude-code), that act as a media-monitoring desk for a small comms team working in the vegan/plant-based and animal-rights space. The first two run on a schedule, do real work unattended, and post their output to a live Discord channel — this isn't a demo, it's been running daily in production since late August 2026. The third was deliberately built to a smaller, honest scope (see its own section below) rather than padded out to look further along than it is.
 
 **New here and not a developer?** This page is written for you — no need to click into any folder to get the gist. Each project below has its own README with full technical detail, linked at the end of its section, for anyone who wants to go deeper.
 
@@ -20,7 +20,7 @@ A second, independent agent that runs weekly, reads the first tool's actual trac
 
 ## 3. Scientific literature tracking — [`vegan-literature-feed`](vegan-literature-feed/)
 
-The same idea extended from news to peer-reviewed research: an agent connected to the PubMed API surfaces fresh studies and review articles on plant-based nutrition and animal welfare science, with enough context (study type, key finding, caveats) that a comms team could credibly write about a finding before mainstream coverage catches up.
+The same idea extended from news to peer-reviewed research: an agent connected to the PubMed API surfaces fresh studies and review articles on plant-based nutrition and animal welfare science, with enough context (study type, key finding, caveats) that a comms team could credibly write about a finding before mainstream coverage catches up. **Deliberately built as a minimum-viable first pass, not yet scheduled** — a real example of knowing when to scope something down and say so plainly, rather than over-claiming how finished it is.
 
 ## Tools and techniques used
 

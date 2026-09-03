@@ -1,5 +1,7 @@
 # Vegan News Feed
 
+*Part of a [3-project AI automation portfolio](../README.md) — start there for the plain-language overview.*
+
 A [Claude Code](https://claude.com/claude-code) skill that acts as daily media monitoring for a small comms team: it finds fresh vegan/plant-based and animal-rights news (Finnish + English), decides what's actually worth including, writes short Finnish summaries, suggests 1-2 ready angles for the team's own social/press content, and posts one formatted digest to Discord.
 
 It's built with a sibling skill, [`vegan-news-feed-review`](../vegan-news-feed-review/), that periodically reviews this skill's own track record and proposes improvements — without ever applying them itself. See below.

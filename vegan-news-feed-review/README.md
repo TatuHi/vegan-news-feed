@@ -1,6 +1,8 @@
 # Vegan News Feed — Review
 
-A companion [Claude Code](https://claude.com/claude-code) skill that reviews its sibling, [`vegan-news-feed`](../vegan-news-feed/), and proposes improvements — without ever applying them itself.
+*Part of a [3-project AI automation portfolio](../README.md) — start there for the plain-language overview.*
+
+A companion [Claude Code](https://claude.com/claude-code) skill that reviews its sibling, [`vegan-news-feed`](../vegan-news-feed/), and proposes improvements — without ever applying them itself. Want to see what it actually produces before reading further? See [`example-output.md`](example-output.md) — a real proposal, captured verbatim.
 
 ## ⚠️ Disclaimer
 
@@ -33,15 +35,17 @@ or just ask Claude Code directly: "aja vegan-news-feedin viikkokatsaus" / "arvio
 ## Repo layout
 
 ```
-SKILL.md                    Agent instructions
-scripts/run_weekly_review.sh  Cron-safe wrapper, also runnable manually anytime
+SKILL.md                       Agent instructions
+example-output.md              A real proposal, captured verbatim
+scripts/run_weekly_review.sh   Cron-safe wrapper, also runnable manually anytime
+scripts/query_term_overlap.py  Generic Google News search-term contribution/overlap analysis
 ```
 
 Proposals it produces live in `~/.config/vegan-news/proposals/`, not in this repo at all — see [`../vegan-news-feed/DATA_LOCATIONS.md`](../vegan-news-feed/DATA_LOCATIONS.md) for why (files inside `~/.claude/skills/` are treated as "sensitive" by Claude Code and block unattended writes).
 
 ## Example output
 
-The first real run (2026-08-26) found only one day of thin, pre-schema-change history and reported honestly that there wasn't enough data to review yet, rather than inventing findings. The second real run (2026-08-29), with a genuine week of history, produced a proposal with actual findings and suggestions — and also a good demonstration of why proposals need human review before being trusted: it initially misattributed a data gap to the wrong cause (a scheduling bug, when the real cause was simply that data collection hadn't started yet), which the human reviewer caught and corrected. Both are preserved at `~/.config/vegan-news/proposals/` on the machine they ran on (not in this repo — see `DATA_LOCATIONS.md`). A typical proposal follows the template in `SKILL.md`'s step 5: dated observations plus concrete, file-and-line-specific suggestions.
+The first real run (2026-08-26) found only one day of thin, pre-schema-change history and reported honestly that there wasn't enough data to review yet, rather than inventing findings. The second real run (2026-08-29), with a genuine week of history, produced a proposal with actual findings — and also a good demonstration of why proposals need human review before being trusted: it initially misattributed a data gap to the wrong cause (a scheduling bug, when the real cause was simply that data collection hadn't started yet), which the human reviewer caught and corrected. The third real run (2026-08-30) — reproduced in full in [`example-output.md`](example-output.md) — was the first to fire from the actual weekly schedule rather than an interactive request, and finished a diagnosis the previous week's review had only flagged as needed, reaching an honest "no change needed" conclusion instead of inventing a fix. All are preserved at `~/.config/vegan-news/proposals/` on the machine they ran on (not in this repo — see `DATA_LOCATIONS.md`). A typical proposal follows the template in `SKILL.md`'s step 5: dated observations plus concrete, file-and-line-specific suggestions.
 
 ## Platform support
 

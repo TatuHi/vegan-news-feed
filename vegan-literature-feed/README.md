@@ -1,5 +1,7 @@
 # Vegan Literature Feed
 
+*Part of a [3-project AI automation portfolio](../README.md) — start there for the plain-language overview.*
+
 A [Claude Code](https://claude.com/claude-code) skill that monitors fresh scientific literature on veganism, plant-based nutrition, animal cognition/sentience, the environmental impact of animal agriculture, and animal-rights policy — surfacing peer-reviewed findings (including review articles and meta-analyses, not just novel primary research) with enough context that a comms team could credibly publish on one before mainstream science journalism does.
 
 **Status: minimum viable, intentionally.** This was built as a first pass and then set aside — see [`TODO.md`](TODO.md) for the honest list of what's deferred (a curated journal source list, scheduling, broader eval coverage) before coming back to it.
