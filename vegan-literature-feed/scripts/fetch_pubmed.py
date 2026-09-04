@@ -40,14 +40,32 @@ RETRY_DELAY_SECONDS = 2
 
 # Laaja OR-kysely joka kattaa kaikki neljä aihepiiriä (ravitsemus/terveys,
 # elainkognitio/-tuntoisuus, elaintuotannon ymparistovaikutus, elainpolitiikka
-# ja -oikeus) - [tiab] = otsikko+abstrakti. Tama on tarkoituksella laaja
-# aloituspiste, ei viimeistelty hakulauseke - tarkennettava kayttokokemuksen
-# perusteella (ks. TODO.md: "references/sources.md kuratoitujen hakusanojen
-# ja lehti-RSS:ien listaksi" on viela tekematta).
+# ja -oikeus) - [tiab] = otsikko+abstrakti.
+#
+# "animal welfare"[tiab] ja "animal cognition"[tiab] EIVAT ole enaa vapaita
+# OR-termeja sellaisenaan - todennettu oikeasti 2026-09-04 etta paljaina
+# termeina ne tuottavat paljon kohinaa (rutiininomaista elainlaaketiedetta,
+# kirurgisia tekniikoita, laitteistokehitysta jne. jolla ei ole mitaan
+# eettista/oikeuksellista kytkosta). 30 paivan testihaku: 162 osumaa paljailla
+# termeilla, joista suuri osa ilmiselvaa kohinaa; sama haku kvalifioituna
+# (vaaditaan rinnalle joku eettisyyteen/tuntoisuuteen viittaava sana) tuotti
+# 69 osumaa, ja pistokoe vahvisti etta pudonneet olivat lahes poikkeuksetta
+# aitoa kohinaa (esim. punkkien tekojasenruokinta, hevosen ohjastaimen
+# sensorikehitys, kasien kayttaytymisen tekoalymallit) - samalla sailyttaen
+# oikeasti hyvia osumia (esim. kalojen kivunkokemusta kasitteleva katsaus).
+# Tama EI tarkoita etta jaljelle jaava data olisi taysin kohinatonta - osa
+# rajatapauksista (esim. rutiininomaiset analgesia-protokollat jotka
+# sisaltavat sanan "pain") paasee yha lapi, mutta se on tarkoituksella
+# jatetty agentin vaiheen 2 harkinnan varaan, ei yritetty ratkaista
+# taydellisesti kyselytasolla - ks. PROCESS.md.
 DEFAULT_QUERY = (
     '("vegan diet"[tiab] OR "plant-based diet"[tiab] OR "plant-based nutrition"[tiab] '
-    'OR "vegetarian diet"[tiab] OR "animal welfare"[tiab] OR "animal sentience"[tiab] '
-    'OR "animal cognition"[tiab] OR "animal ethics"[tiab] OR "animal rights"[tiab] '
+    'OR "vegetarian diet"[tiab] OR "animal sentience"[tiab] OR "animal ethics"[tiab] '
+    'OR "animal rights"[tiab] '
+    'OR (("animal welfare"[tiab] OR "animal cognition"[tiab]) AND ('
+    '"policy"[tiab] OR "ethics"[tiab] OR "consumer"[tiab] OR "public attitudes"[tiab] '
+    'OR "legislation"[tiab] OR "pain"[tiab] OR "sentience"[tiab] OR "emotion"[tiab] '
+    'OR "consciousness"[tiab])) '
     'OR ("livestock"[tiab] AND "environmental impact"[tiab]) '
     'OR ("meat production"[tiab] AND "climate"[tiab]) '
     'OR ("animal agriculture"[tiab] AND "policy"[tiab]))'
