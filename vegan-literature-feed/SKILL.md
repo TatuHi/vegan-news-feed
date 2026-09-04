@@ -36,7 +36,7 @@ Tämä hakee PubMedista viimeisen 7 päivän (oletus, säädettävissä `--days`
 Käy läpi vaiheen 1 kaikki kohteet (PubMed + WebSearch-täydennys). Tarkista ensin lähetyshistoria duplikaattien varalta:
 
 ```bash
-python3 ~/.claude/skills/vegan-news-feed/scripts/history.py show --days 14 --history-file ~/.config/vegan-literature/literature_history.json
+python3 ~/.claude/skills/vegan-news-feed/scripts/history.py --history-file ~/.config/vegan-literature/literature_history.json show --days 14
 ```
 
 (Käytetään samaa `history.py`-skriptiä kuin `vegan-news-feed`, mutta omalla `--history-file`-polulla — ei omaa kopiota skriptistä, ks. `README.md`.)
@@ -107,7 +107,7 @@ Käytetään suoraan `vegan-news-feed`:n `post_discord.py`-skriptiä (identtinen
 **Aina, myös kun tuloksia ei löytynyt** — sama periaate kuin `vegan-news-feed`:ssä (ks. sen `SKILL.md`:n vaihe 7 täydelle perustelulle).
 
 ```bash
-python3 ~/.claude/skills/vegan-news-feed/scripts/history.py record --items-file /tmp/literature_items.json --history-file ~/.config/vegan-literature/literature_history.json
+python3 ~/.claude/skills/vegan-news-feed/scripts/history.py --history-file ~/.config/vegan-literature/literature_history.json record --items-file /tmp/literature_items.json
 ```
 
 Sama muoto kuin `vegan-news-feed`:ssä: yksi `{"type": "run", "result": "sent"/"no_news", "item_count": N}` -kohde aina, ja lisäksi yksi `{"type": "literature", "title": ..., "link": ..., "summary": ..., "source": ..., "pub_types": [...]}` -kohde per lähetetty artikkeli (käytä `"type": "literature"` erottamaan nämä `vegan-news-feed`:n `"news"`-kohteista, jos historiatiedostot joskus yhdistetään).

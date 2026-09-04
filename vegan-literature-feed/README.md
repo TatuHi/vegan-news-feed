@@ -4,11 +4,11 @@
 
 A [Claude Code](https://claude.com/claude-code) skill that monitors fresh scientific literature on veganism, plant-based nutrition, animal cognition/sentience, the environmental impact of animal agriculture, and animal-rights policy — surfacing peer-reviewed findings (including review articles and meta-analyses, not just novel primary research) with enough context that a comms team could credibly publish on one before mainstream science journalism does.
 
-**Status: minimum viable, intentionally.** This was built as a first pass and then set aside — see [`TODO.md`](TODO.md) for the honest list of what's deferred (a curated journal source list, scheduling, broader eval coverage) before coming back to it.
+**Status: running weekly.** Built as a minimum-viable first pass, then taken all the way through a real end-to-end run (fetch → relevance judgment → summaries → Discord send) and scheduled — see [`example-output.md`](example-output.md) for real output and [`TODO.md`](TODO.md) for what's still honestly deferred (a curated journal source list, broader eval coverage).
 
 ## ⚠️ Disclaimer
 
-`scripts/fetch_pubmed.py` was written by Claude (an AI, via Claude Code), as documented in [`PROCESS.md`](PROCESS.md). **It has not been independently reviewed by a human for correctness, security, or safety** — it has been run once against the live PubMed API to confirm it returns sane, parseable results (see `PROCESS.md`), which is not the same thing as a security or code review.
+Every script here was written by Claude (an AI, via Claude Code), as documented in [`PROCESS.md`](PROCESS.md). **None of it has been independently reviewed by a human for correctness, security, or safety** — it has been tested for behavior (a full real run, end to end, plus `fetch_pubmed.py` verified separately against the live PubMed API), which is not the same thing as a security or code review.
 
 If you clone and run this code — especially if you ever schedule it, where it runs unattended with your credentials — **read it yourself first.** Don't run it blindly. The repository owner takes no responsibility for what happens if you do.
 
@@ -46,9 +46,9 @@ chmod 600 ~/.config/vegan-literature/.env
 Reusing the same webhook value as `vegan-news-feed` is fine for testing — see "Shared webhook, for now" below.
 
 **3. Run it manually**
-Ask Claude Code something matching `SKILL.md`'s trigger phrasing, e.g. "aja vegan-literature-feed-skilli" or "onko alalla tullut mielenkiintoista tutkimusta?".
+Ask Claude Code something matching `SKILL.md`'s trigger phrasing, e.g. "aja vegan-literature-feed-skilli" or "onko alalla tullut mielenkiintoista tutkimusta?" — or run `scripts/run_weekly.sh` directly.
 
-**4. Scheduling: not yet.** Unlike `vegan-news-feed`, this skill has no `run_daily.sh`/LaunchAgent wrapper yet — deliberately deferred (see `TODO.md`). When it's built, it should copy `vegan-news-feed/scripts/run_daily.sh`'s pattern directly (pinned Python path, pinned `claude` binary path, LaunchAgent not cron, dual-channel failure alerting) rather than rediscovering any of those three already-solved bugs.
+**4. Or schedule it** — a macOS LaunchAgent, not cron, same reasoning as `vegan-news-feed` (cron can't reach Keychain-based `claude` login; see its `SKILL.md` "Ajastaminen" section for the full explanation and `.plist` template). `run_weekly.sh` copies `run_daily.sh`'s environment-safety pattern directly (pinned Python path, pinned `claude` binary path, dual-channel failure alerting) rather than rediscovering any of those three already-solved bugs. On the machine this was developed on, it's scheduled for **Sundays at 14:00** — weekly rather than daily, a deliberate choice made with real data: a 60-day test of the PubMed query returned only ~0.67 relevant items/day, so daily would mean frequent "nothing new" runs. See `PROCESS.md` for the full reasoning.
 
 ## Shared webhook, for now
 
@@ -58,18 +58,24 @@ Ask Claude Code something matching `SKILL.md`'s trigger phrasing, e.g. "aja vega
 
 `post_discord.py` and `history.py` are **not copied into this skill** — `SKILL.md` calls `../vegan-news-feed/scripts/post_discord.py` and `../vegan-news-feed/scripts/history.py` directly (the latter with `--history-file ~/.config/vegan-literature/literature_history.json` to keep its own history separate). Both scripts do an identical, generic job for either skill — duplicating them would just be two copies to keep in sync. Only `fetch_pubmed.py` is genuinely new, since the fetch mechanism (PubMed API, not RSS) is the one part that had to differ.
 
+## Example output
+
+See [`example-output.md`](example-output.md) — a real digest, sent and captured verbatim, from the skill's first full end-to-end run (2026-09-04). Worth noting: it includes a study showing a vegan diet *reduced* muscle mass in older adults without resistance training, and one showing vegan children were shorter with lower growth markers than peers — both included with real caveats, not filtered out for being inconvenient findings. That's the "honest limitations, not just favorable results" principle from `SKILL.md` actually holding up in practice, not just stated as an intention.
+
 ## Repo layout
 
 ```
-SKILL.md              Agent instructions Claude Code actually reads to run this skill
-PROCESS.md            Design history: why it's built this way, what changed and why
-TODO.md                What's deliberately deferred, and why
-.env.example           Template showing the required env var — no real secret in it
+SKILL.md               Agent instructions Claude Code actually reads to run this skill
+PROCESS.md             Design history: why it's built this way, what changed and why
+TODO.md                 What's deliberately deferred, and why
+example-output.md       A real digest, captured verbatim
+.env.example            Template showing the required env var — no real secret in it
 scripts/
-  fetch_pubmed.py       Fetches recent PubMed articles via E-utilities (stdlib only)
-evals/evals.json       A first pass at test prompts — thin coverage, see TODO.md
+  fetch_pubmed.py        Fetches recent PubMed articles via E-utilities (stdlib only)
+  run_weekly.sh           Cron-safe wrapper, also runnable manually anytime
+evals/evals.json        A first pass at test prompts — thin coverage, see TODO.md
 ```
 
 ## Platform support
 
-Same situation as `vegan-news-feed`: `fetch_pubmed.py` itself is pure Python standard library and portable to Linux/Windows given Python 3.10+. There's no wrapper script yet to make OS-specific in the first place — that question only becomes real once scheduling is built (see `TODO.md`).
+Same situation as `vegan-news-feed`: `fetch_pubmed.py` itself is pure Python standard library and portable to Linux/Windows given Python 3.10+. `run_weekly.sh` is the macOS-specific piece (Bash, hardcoded Python.org paths, `osascript` for failure notifications, LaunchAgent scheduling) — see `vegan-news-feed/README.md`'s own "Platform support" section for the fuller breakdown of what would need reworking on Linux/Windows.

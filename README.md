@@ -1,6 +1,6 @@
 # AI Media Monitoring for Vegan/Animal-Rights Communications
 
-Three connected AI automations, built with [Claude Code](https://claude.com/claude-code), that act as a media-monitoring desk for a small comms team working in the vegan/plant-based and animal-rights space. The first two run on a schedule, do real work unattended, and post their output to a live Discord channel — this isn't a demo, it's been running daily in production since late August 2026. The third was deliberately built to a smaller, honest scope (see its own section below) rather than padded out to look further along than it is.
+Three connected AI automations, built with [Claude Code](https://claude.com/claude-code), that act as a media-monitoring desk for a small comms team working in the vegan/plant-based and animal-rights space. All three run on a schedule, do real work unattended, and post their output to a live Discord channel — this isn't a demo, it's running in production.
 
 **New here and not a developer?** This page is written for you — no need to click into any folder to get the gist. Each project below has its own README with full technical detail, linked at the end of its section, for anyone who wants to go deeper.
 
@@ -20,7 +20,9 @@ A second, independent agent that runs weekly, reads the first tool's actual trac
 
 ## 3. Scientific literature tracking — [`vegan-literature-feed`](vegan-literature-feed/)
 
-The same idea extended from news to peer-reviewed research: an agent connected to the PubMed API surfaces fresh studies and review articles on plant-based nutrition and animal welfare science, with enough context (study type, key finding, caveats) that a comms team could credibly write about a finding before mainstream coverage catches up. **Deliberately built as a minimum-viable first pass, not yet scheduled** — a real example of knowing when to scope something down and say so plainly, rather than over-claiming how finished it is.
+The same idea extended from news to peer-reviewed research: an agent connected to the PubMed API surfaces fresh studies and review articles on plant-based nutrition and animal welfare science, with enough context (study type, key finding, caveats) that a comms team could credibly write about a finding before mainstream coverage catches up. Started as a deliberately scoped-down first pass, then taken through a real end-to-end run and scheduled weekly once the actual publication volume (measured, not guessed) showed daily would mostly produce empty digests — a real example of scoping decisions made with evidence, not gut feeling.
+
+**See it in action:** [`example-output.md`](vegan-literature-feed/example-output.md) — a real digest, including a study with an inconvenient finding (a vegan diet reducing muscle mass in older adults without resistance training) included with honest caveats rather than filtered out.
 
 ## Tools and techniques used
 
