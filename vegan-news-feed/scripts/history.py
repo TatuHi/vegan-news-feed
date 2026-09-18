@@ -52,6 +52,18 @@ Tama on tarkoituksella joustava eika kiinteasti skeemoitu, jotta:
       erottaa "ajettiin, ei loytynyt mitaan relevanttia" -paivan
       "ajoa ei koskaan tapahtunut" -paivasta `gaps`-komennossa - ilman
       run-merkintaa nailla kahdella tapauksella ei olisi eroa.
+
+      TARKEA HUOMIO (loytyi vegan-news-feed-review:n 06.09.2026
+      katselmoinnissa): "run"-merkinnan "item_count" kuvaa AINA vain
+      mita oikeasti lahetettiin/broadcastattiin sina paivana - se ei
+      kasva jalkikateen jos samalle paivalle lisataan "recovered_via"-
+      merkittyja "news"-kohteita (ks. PROCESS.md:n iteraatio 10). Tama
+      on tarkoituksellista: "item_count" vastaa kysymykseen "mita
+      kayttaja nakisi jos katsoisi sen paivan Discord-viestia", ei
+      "montako kohdetta historiassa on tuolle paivalle". Jos lasket
+      paivan todellisen "news"-kohteiden maaran suoraan historiasta,
+      se voi siis olla suurempi kuin saman paivan "item_count" - tama
+      ERO on odotettu, ei virhe korjattavaksi.
       Jalkikateen taytetyt (backfill) merkinnat - mika tahansa tyyppi -
       merkitaan lisaksi kentalla "backfilled": true.
 
