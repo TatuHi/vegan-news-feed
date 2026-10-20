@@ -38,18 +38,38 @@ if [ -z "${DISCORD_WEBHOOK_URL:-}" ]; then
 fi
 
 # Sama kaksikanavainen halytysperiaate kuin run_daily.sh:ssa.
+#
+# Peräkkäisten epäonnistumisten eskalointi - sama mekanismi kuin
+# run_daily.sh:ssa ja run_weekly_review.sh:ssa (ks. run_daily.sh:n kommentit
+# taustasta), oma streak-tiedosto tämän skillin erillisessä config-kansiossa.
+FAILURE_STREAK_FILE="$HOME/.config/vegan-literature/failure_streak"
+FAILURE_ESCALATE_THRESHOLD=2
+
 notify_failure() {
   local exit_code="${1:-$?}"
   echo "[run_weekly.sh] Ajo epaonnistui exit-koodilla $exit_code" >&2
 
+  local streak
+  streak="$(cat "$FAILURE_STREAK_FILE" 2>/dev/null || echo 0)"
+  streak=$((streak + 1))
+  echo "$streak" > "$FAILURE_STREAK_FILE" 2>/dev/null || true
+
   curl -s -o /dev/null --max-time 10 \
     -H "Content-Type: application/json" \
     -H "User-Agent: Mozilla/5.0 (compatible; vegan-literature-feed-bot/1.0)" \
-    -d "{\"content\":\"⚠️ vegan-literature-feed-ajo epäonnistui (exit $exit_code). Tarkista loki koneella.\"}" \
+    -d "{\"content\":\"⚠️ vegan-literature-feed-ajo epäonnistui (exit $exit_code, $streak. kerta peräkkäin). Tarkista loki koneella.\"}" \
     "$DISCORD_WEBHOOK_URL" || echo "[run_weekly.sh] Virheilmoituksen lahetys Discordiin epaonnistui." >&2
 
+  if [ "$streak" -ge "$FAILURE_ESCALATE_THRESHOLD" ]; then
+    curl -s -o /dev/null --max-time 10 \
+      -H "Content-Type: application/json" \
+      -H "User-Agent: Mozilla/5.0 (compatible; vegan-literature-feed-bot/1.0)" \
+      -d "{\"content\":\"🚨 **VAROITUS: vegan-literature-feed on epäonnistunut $streak viikkoa PERÄKKÄIN** (viimeisin: exit $exit_code). Tarkista koneelta pikimmiten, esim. \`claude\`-CLI:n kirjautuminen (OAuth-istunto voi olla vanhentunut) ja loki \`~/Library/Logs/vegan-literature-feed.log\`.\"}" \
+      "$DISCORD_WEBHOOK_URL" || echo "[run_weekly.sh] Eskalaatioilmoituksen lahetys Discordiin epaonnistui." >&2
+  fi
+
   if command -v osascript >/dev/null 2>&1; then
-    osascript -e "display notification \"exit $exit_code — tarkista loki: ~/Library/Logs/vegan-literature-feed.log\" with title \"vegan-literature-feed epäonnistui\" sound name \"Basso\"" \
+    osascript -e "display notification \"exit $exit_code ($streak. kerta peräkkäin) — tarkista loki: ~/Library/Logs/vegan-literature-feed.log\" with title \"vegan-literature-feed epäonnistui\" sound name \"Basso\"" \
       || echo "[run_weekly.sh] macOS-ilmoituksen nayttaminen epaonnistui." >&2
   fi
 }
@@ -85,3 +105,6 @@ cd "$HOME/.claude/skills/vegan-literature-feed"
   --allowedTools "Bash,Read,Write,WebFetch,WebSearch" \
   --add-dir "$HOME/.claude/skills/vegan-news-feed" \
   --add-dir "$HOME/.config/vegan-literature"
+
+# Onnistui - nollataan peräkkäisten epäonnistumisten laskuri.
+echo 0 > "$FAILURE_STREAK_FILE" 2>/dev/null || true

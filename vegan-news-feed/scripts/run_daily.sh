@@ -38,18 +38,43 @@ fi
 # Discord-hälytys ei koskaan tavoittaisi ketään. macOS-ilmoitus ei riipu
 # verkosta eika webhookista lainkaan, joten se toimii vaikka Discord-osuus
 # olisi juuri se rikkoutunut palanen.
+#
+# Peräkkäisten epäonnistumisten eskalointi: 2026-09-21 - 2026-10-18 koko ajo
+# oli rikki (claude-CLI:n OAuth-istunto vanhentunut) ilman etta kukaan
+# huomasi 17 paivaan - jokainen yksittainen paiva lahetti saman nakoisen
+# yksittaisen ⚠️-viestin, joka hukkui huomaamatta. FAILURE_STREAK_FILE
+# muistaa peräkkäisten (nollautuu onnistuneesta ajosta) epaonnistumisten
+# maaran, jotta kynnyksen ylittyessa voidaan lahettaa selvasti erottuva
+# lisahalytys sen sijaan etta luotettaisiin yksittaisen viestin huomattavan
+# tulevan.
+FAILURE_STREAK_FILE="$HOME/.config/vegan-news/failure_streak"
+FAILURE_ESCALATE_THRESHOLD=3
+
 notify_failure() {
   local exit_code="${1:-$?}"
   echo "[run_daily.sh] Ajo epaonnistui exit-koodilla $exit_code" >&2
 
+  local streak
+  streak="$(cat "$FAILURE_STREAK_FILE" 2>/dev/null || echo 0)"
+  streak=$((streak + 1))
+  echo "$streak" > "$FAILURE_STREAK_FILE" 2>/dev/null || true
+
   curl -s -o /dev/null --max-time 10 \
     -H "Content-Type: application/json" \
     -H "User-Agent: Mozilla/5.0 (compatible; vegan-news-feed-bot/1.0)" \
-    -d "{\"content\":\"⚠️ vegan-news-feed-ajo epäonnistui (exit $exit_code). Tarkista loki koneella.\"}" \
+    -d "{\"content\":\"⚠️ vegan-news-feed-ajo epäonnistui (exit $exit_code, $streak. kerta peräkkäin). Tarkista loki koneella.\"}" \
     "$DISCORD_WEBHOOK_URL" || echo "[run_daily.sh] Virheilmoituksen lahetys Discordiin epaonnistui." >&2
 
+  if [ "$streak" -ge "$FAILURE_ESCALATE_THRESHOLD" ]; then
+    curl -s -o /dev/null --max-time 10 \
+      -H "Content-Type: application/json" \
+      -H "User-Agent: Mozilla/5.0 (compatible; vegan-news-feed-bot/1.0)" \
+      -d "{\"content\":\"🚨 **VAROITUS: vegan-news-feed on epäonnistunut $streak päivää PERÄKKÄIN** (viimeisin: exit $exit_code). Tämä ei enää todennäköisesti ole ohimenevä häiriö - tarkista koneelta pikimmiten, esim. \`claude\`-CLI:n kirjautuminen (OAuth-istunto voi olla vanhentunut) ja loki \`~/Library/Logs/vegan-news-feed.log\`.\"}" \
+      "$DISCORD_WEBHOOK_URL" || echo "[run_daily.sh] Eskalaatioilmoituksen lahetys Discordiin epaonnistui." >&2
+  fi
+
   if command -v osascript >/dev/null 2>&1; then
-    osascript -e "display notification \"exit $exit_code — tarkista loki: ~/Library/Logs/vegan-news-feed.log\" with title \"vegan-news-feed epäonnistui\" sound name \"Basso\"" \
+    osascript -e "display notification \"exit $exit_code ($streak. kerta peräkkäin) — tarkista loki: ~/Library/Logs/vegan-news-feed.log\" with title \"vegan-news-feed epäonnistui\" sound name \"Basso\"" \
       || echo "[run_daily.sh] macOS-ilmoituksen nayttaminen epaonnistui." >&2
   fi
 }
@@ -87,3 +112,8 @@ cd "$HOME/.claude/skills/vegan-news-feed"
 # claude korvaisi koko shell-prosessin.
 "$CLAUDE_BIN" -p "Aja vegan-news-feed-skilli ja lähetä tämän päivän koonti Discordiin" \
   --allowedTools "Bash,Read,Write,WebFetch,WebSearch"
+
+# Onnistui (trap ERR ei lauennut tähän mennessä) - nollataan peräkkäisten
+# epäonnistumisten laskuri, jotta eskalaatiokynnys mittaa aina vain
+# yhtäjaksoista, käynnissä olevaa häiriötä.
+echo 0 > "$FAILURE_STREAK_FILE" 2>/dev/null || true
