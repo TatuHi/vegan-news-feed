@@ -264,3 +264,11 @@ Käyttäjä kysyi 2026-10-08 miksi "vegan news feedin automaattiset ilmoitukset,
 **Todennus, ei oletus:** koko mekanismi testattiin eristetysti ennen pushausta — kopioitu `notify_failure`-logiikka ajettiin `curl`/`osascript`-mockien kanssa simuloiden 3 peräkkäistä epäonnistumista (eskalaatio laukesi oikealla kynnyksellä, molemmilla kynnysarvoilla 2 ja 3), sitten onnistumisen simulointi (nollaus) ja uusi epäonnistuminen (laskuri alkoi oikein uudelleen 1:stä). Kaikki kolme skriptiä myös `bash -n`-syntaksitarkistettu.
 
 **Ei korjattu tässä iteraatiossa: itse 17 päivän aukko historiassa.** Backfillataanko 2026-09-21–2026-10-18 väli vai jätetäänkö aukoksi, on edelleen avoin päätös (ks. `TODO.md`) — tämä iteraatio ehkäisee saman tilanteen TOISTUMISEN, ei korjaa jo menetettyä dataa.
+
+## 19. Iteraatio 16: sama `/tmp`-jumiutumiskorjaus levitettiin ennakoivasti tähän ja katselmointiskilliin
+
+`vegan-literature-feed`:n 2026-09-21 `/tmp`-jumiutumisbugi (diagnosoitu ja korjattu, ks. sen `PROCESS.md` iteraatio 6) perustuu ennakkoehtoon joka on identtinen tässäkin skillissä ja `vegan-news-feed-review`:ssa: kiinteät `/tmp`-tiedostonimet, ei `Edit`-työkalua `--allowedTools`-listalla. Kumpikaan ei ole (vielä) oikeasti osunut tähän — puhdasta tuuria ajoituksessa, ei rakenteellista eroa.
+
+**Korjaus levitetty ennakoivasti, ei vasta vahingon jälkeen:** `run_daily.sh` siivoaa nyt `rm -f`:lla `/tmp/vegan_news_raw.json`, `/tmp/vegan_digest.md` ja `/tmp/vegan_digest_items.json` ennen `claude -p`-kutsua; `run_weekly_review.sh` vastaavasti oman `/tmp/review_notification.md`:nsä. Sama periaate kuin `vegan-literature-feed`:ssä: agentti ei voi koskaan kohdata valmiiksi olemassa olevaa tiedostoa, joten sillä ei ole koskaan syytä tavoitella `Edit`-työkalua näissä kohdissa.
+
+**Todennus, ei oletus:** molemmat skriptit syntaksitarkistettu (`bash -n`), ja kummankin `rm -f`-rivi testattu erikseen (tiedostot luotu, siivottu, vahvistettu poistuneiksi; sekä vahvistettu ettei `rm -f` virheile kun tiedostoja ei ole, mikä on normaali tapaus kun edellinen ajo on mennyt läpi siististi).

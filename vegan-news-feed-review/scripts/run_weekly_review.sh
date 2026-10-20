@@ -107,6 +107,15 @@ fi
 
 cd "$HOME/.claude/skills/vegan-news-feed-review"
 
+# Ennaltaehkaiseva korjaus samaan bugiluokkaan joka pysaytti
+# vegan-literature-feedin 2026-09-21 (ks. sen PROCESS.md iteraatio 6, ja
+# vegan-news-feed/scripts/run_daily.sh:n vastaava kommentti): edellisen ajon
+# jaljilta /tmp:iin jaanyt tiedosto voi saada agentin yrittamaan sen
+# MUOKKAUSTA (Edit) sen sijaan etta se kirjoittaisi sen kokonaan uudelleen
+# (Write) - Edit ei ole --allowedTools-listalla, joten headless-istunto
+# jaisi jumiin kysymaan lupaa jota kukaan ei voisi antaa.
+rm -f /tmp/review_notification.md
+
 # Ei "exec" tassa: trap ERR ei laukeaisi enaa taman prosessin jalkeen.
 # Ei tarvita WebFetch/WebSearch-oikeuksia - taama skilli ei hae ulkoista
 # dataa, vain lukee vegan-news-feedin paikallista historiaa ja tiedostoja.

@@ -108,6 +108,16 @@ fi
 
 cd "$HOME/.claude/skills/vegan-news-feed"
 
+# Ennaltaehkaiseva korjaus samaan bugiluokkaan joka pysaytti
+# vegan-literature-feedin 2026-09-21 (ks. sen PROCESS.md iteraatio 6):
+# edellisen ajon jaljilta /tmp:iin jaanyt tiedosto voi saada agentin
+# yrittamaan sen MUOKKAUSTA (Edit) taman paivan paivamaaraan sen sijaan
+# etta se kirjoittaisi tiedoston kokonaan uudelleen (Write) - Edit ei ole
+# --allowedTools-listalla, joten headless-istunto jaisi jumiin kysymaan
+# lupaa jota kukaan ei voisi antaa. Taalla ei (viela) ole oikeasti osuttu
+# tahan, mutta ennakkoehto on identtinen, joten siivotaan samalla tavalla.
+rm -f /tmp/vegan_news_raw.json /tmp/vegan_digest.md /tmp/vegan_digest_items.json
+
 # Ei "exec" tassa: trap ERR ei laukeaisi enaa taman prosessin jalkeen, jos
 # claude korvaisi koko shell-prosessin.
 "$CLAUDE_BIN" -p "Aja vegan-news-feed-skilli ja lähetä tämän päivän koonti Discordiin" \
