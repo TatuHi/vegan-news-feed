@@ -95,6 +95,17 @@ fi
 
 cd "$HOME/.claude/skills/vegan-literature-feed"
 
+# Edellisen (mahdollisesti kesken jaaneen) ajon jaljilta jaanyt /tmp-tiedosto
+# aiheutti 2026-09-21 todellisen tuotanto-ongelman: agentti loysi jo olemassa
+# olevan /tmp/literature_digest.md:n ja yritti MUOKATA (Edit-tyokalu) sita
+# paivamaaran paivittamiseksi sen sijaan etta olisi kirjoittanut sen
+# kokonaan uudelleen (Write) - Edit ei ole --allowedTools-listalla, joten
+# headless-istunto jai jumiin kysymaan lupaa jota kukaan ei voinut antaa
+# (ks. PROCESS.md). Siivotaan kaikki taman skillin /tmp-tiedostot ENNEN
+# jokaista ajoa, jotta agentti ei koskaan kohtaa valmiiksi olemassa olevaa
+# tiedostoa eika voi paatya samaan tilanteeseen uudelleen.
+rm -f /tmp/vegan_literature_raw.json /tmp/literature_digest.md /tmp/literature_items.json
+
 # --add-dir kahdesta syysta, sama kuin vegan-news-feed-review:lla:
 # 1. history.py/post_discord.py asuvat sisarskillissa (vegan-news-feed).
 # 2. Kirjallisuushistoria (~/.config/vegan-literature/literature_history.json)
