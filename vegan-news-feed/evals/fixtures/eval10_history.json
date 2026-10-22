@@ -1,0 +1,50 @@
+[
+  {
+    "type": "run",
+    "title": "run-merkintä",
+    "result": "sent",
+    "item_count": 5,
+    "date": "2026-10-21"
+  },
+  {
+    "type": "news",
+    "title": "Uusi vegaaniyritys keräsi 5 miljoonan euron rahoituskierroksen",
+    "link": "https://esimerkkiuutiset.fi/rahoituskierros-2026-10-21",
+    "summary": "Uusi vegaaniyritys keräsi 5 miljoonan euron rahoituskierroksen. Rahoitusta käytetään tuotannon laajentamiseen.",
+    "source": "Esimerkkiuutiset",
+    "language": "fi",
+    "date": "2026-10-21"
+  },
+  {
+    "type": "run",
+    "title": "run-merkintä",
+    "result": "sent",
+    "item_count": 5,
+    "date": "2026-10-20"
+  },
+  {
+    "type": "news",
+    "title": "Kasvipohjainen startup sai 3 miljoonan euron sijoituksen",
+    "link": "https://esimerkkiuutiset.fi/rahoituskierros-2026-10-20",
+    "summary": "Kasvipohjainen startup sai 3 miljoonan euron sijoituksen. Rahoitusta käytetään tuotannon laajentamiseen.",
+    "source": "Esimerkkiuutiset",
+    "language": "fi",
+    "date": "2026-10-20"
+  },
+  {
+    "type": "run",
+    "title": "run-merkintä",
+    "result": "sent",
+    "item_count": 5,
+    "date": "2026-10-19"
+  },
+  {
+    "type": "news",
+    "title": "Vegaaninen juustovalmistaja keräsi uuden rahoituskierroksen",
+    "link": "https://esimerkkiuutiset.fi/rahoituskierros-2026-10-19",
+    "summary": "Vegaaninen juustovalmistaja keräsi uuden rahoituskierroksen. Rahoitusta käytetään tuotannon laajentamiseen.",
+    "source": "Esimerkkiuutiset",
+    "language": "fi",
+    "date": "2026-10-19"
+  }
+]

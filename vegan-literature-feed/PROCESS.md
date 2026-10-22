@@ -94,3 +94,13 @@ Iteraatio 15:n (`vegan-news-feed/PROCESS.md`) OAuth-katkon tutkimisen sivutuotte
 **Todennus, ei oletus:** syntaksitarkistettu (`bash -n`), ja `rm -f`-rivi testattu erikseen luomalla kaikki kolme tiedostoa, ajamalla siivous, ja varmistamalla että kaikki kolme katosivat — sekä varmistamalla ettei `rm -f` virheile kun tiedostoja ei ole lainkaan (normaali tapaus joka viikko kun edellinen ajo on mennyt siististi läpi).
 
 **Sama riskiluokka on olemassa myös `vegan-news-feed`:ssa ja `vegan-news-feed-review`:ssa** (molemmat käyttävät vastaavia `/tmp`-tiedostoja, kummallakaan ei ole `Edit`:ä `--allowedTools`-listalla) - ei kuitenkaan korjattu ennakoivasti tässä iteraatiossa, koska pyyntö koski nimenomaan tätä skilliä. Kirjattu `vegan-news-feed/TODO.md`:hen harkittavaksi.
+
+## 10. Iteraatio 7: `evals/evals.json` ajettu oikeasti ensimmäistä kertaa — 4/4 PASS
+
+Käyttäjä pyysi 2026-10-22 ajamaan tämän skillin neljä eval-promptia oikeasti, samalla kertaa kuin `vegan-news-feed`:n 10 omaa (ks. sen `PROCESS.md` iteraatio 17 täydelle metodologialle — sama malli kummallakin: tuore eristetty subagentti per eval, kielletty koskemasta `.env`-tiedostoon/oikeaan webhookiin/oikeaan historiatiedostoon, `--history-file` pakotettuna fixture-polkuun).
+
+**Fixture-strategia:** evalit 2, 3, 4 kuvaavat promptissaan tarkan, keksityn artikkelin (systemaattinen katsaus, hiiritutkimus, bioRxiv-preprint) — näille rakennettiin `evals/fixtures/evalN_raw.json`-tiedostot `vaiheen 1 jo tehty` -korvikkeeksi `fetch_pubmed.py`:n ajamisen sijaan. Eval 1 ("aja normaalisti") käytti sen sijaan oikeaa, reaaliaikaista `fetch_pubmed.py`- ja WebSearch-hakua, koska se on lukuoperaatio eikä vaadi determinismiä.
+
+**Tulos: 4/4 PASS.** Täysi taulukko ja perustelut: `evals/results_2026-10-22.md`. Jälkikäteen vahvistettu `md5`-tarkistuksella ettei `~/.config/vegan-literature/literature_history.json` tai `.env` muuttunut ajon aikana.
+
+**Kaksi sivulöydöstä kirjattu `TODO.md`:hen, ei korjattu tässä iteraatiossa:** (a) eval 1:n agentti huomasi itse ettei WebSearch-täydennyshauilla ole samaa päivärajausta kuin PubMed-haun `--days`-parametrilla — yksi 10 vrk vanha WebSearch-löydös pääsi mukaan vain koska historia oli vielä tyhjä; (b) eval 4:n `history.py record`-testiajo ei tallentanut mitään, todennäköisesti koska run-merkinnästä puuttui `title`-kenttä (sama footgun kuin `vegan-news-feed`-puolella, ks. sen `PROCESS.md`/`TODO.md` — `history.py` on jaettu skripti, joten korjaus kirjataan vain kertaalleen sinne).
