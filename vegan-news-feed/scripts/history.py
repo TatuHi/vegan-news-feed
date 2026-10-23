@@ -134,11 +134,23 @@ def cmd_record(args):
 
     entries = load_history(args.history_file)
 
-    for item in new_items:
+    saved_count = 0
+    for i, item in enumerate(new_items):
         if not isinstance(item, dict):
+            print(f"[varoitus] items-file:n kohde #{i} ei ole JSON-objekti, ohitettu.", file=sys.stderr)
             continue
         title = (item.get("title") or "").strip()
         if not title:
+            # Hiljainen ohitus tasta aiheutti 2026-10-22 oikean bugin (ks.
+            # evals/results_2026-10-22.md): run-merkinta ilman "title"-kenttaa
+            # katosi jaljettomasti, mika nakyisi tuotannossa vaarana
+            # history.py gaps -loytona "ajo jai valiin" vaikka putki ajoi
+            # normaalisti - vain items-file unohti title-kentan.
+            print(
+                f"[varoitus] items-file:n kohde #{i} ({item.get('type', 'tuntematon tyyppi')!r}) "
+                "ohitettu, koska 'title'-kentta puuttuu tai on tyhja. Tama kohde EI tallennu historiaan.",
+                file=sys.stderr,
+            )
             continue
         # Sailytetaan KAIKKI item-objektin kentat (summary, source, type, ...),
         # ei vain title/link - ks. moduulin docstring miksi.
@@ -146,12 +158,15 @@ def cmd_record(args):
         entry["title"] = title
         entry["date"] = target_date
         entries.append(entry)
+        saved_count += 1
 
     entries = prune(entries, args.keep_days)
     save_history(args.history_file, entries)
 
+    skipped_count = len(new_items) - saved_count
+    skipped_note = f", {skipped_count} ohitettu (ks. yllaolevat varoitukset)" if skipped_count else ""
     print(
-        f"Tallennettu {len(new_items)} kohdetta historiaan paivamaaralla {target_date} "
+        f"Tallennettu {saved_count} kohdetta historiaan paivamaaralla {target_date}{skipped_note} "
         f"({args.history_file}), historiassa nyt {len(entries)} merkintaa "
         f"(yli {args.keep_days} vrk vanhat siivottu).",
         file=sys.stderr,

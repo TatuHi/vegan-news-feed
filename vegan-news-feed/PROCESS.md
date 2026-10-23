@@ -285,4 +285,16 @@ Kaikki 10 `vegan-news-feed`:n eval-promptia (ja 4 `vegan-literature-feed`:n omaa
 
 **Tulos: 9/10 PASS vegan-news-feed:lla, 4/4 PASS vegan-literature-feed:lla.** Täysi taulukko ja perustelut: `evals/results_2026-10-22.md` (molemmissa skilleissä oma tiedostonsa). Ainoa ei-puhdas tulos oli id 5 (Google News -linkin varapolku): fixturen täysin keksitty tarina ei voinut koskaan saada oikeaa vahvistusta, joten agentti päätyi jättämään uutisen kokonaan pois sen sijaan että olisi käyttänyt varapolkua — mutta sama varapolku-logiikka toimi todistetusti oikein eval 9:n ajossa, jossa raakadata oli oikeaa mutta linkki silti vaikea vahvistaa. Tämä on fixturen rajoitus, ei skillin virhe — kirjattu `results_2026-10-22.md`:hen rehellisesti, ei piiloteltu puhtaana PASS:ina.
 
-**Sivulöydökset kirjattu `TODO.md`:hen, ei korjattu tässä iteraatiossa:** (a) `history.py record` pudottaa hiljaa `title`-kentättömän kohteen (löytyi literature-eval 4:stä), (b) jaettu `empty_history.json`-fixture ei ole samanaikaisuusturvallinen usean rinnakkaisen evalin kesken, (c) yleiskäyttöiset eval-subagentit saattavat itse haarauttaa lisää agentteja jotka perivät koko kontekstin ja ajavat osan putkesta uudelleen (havaittu kahdesti, ei turvallisuusriski mutta lisää kohinaa) — kaikki kolme ovat eval-harnessin, ei itse skillin, löydöksiä.
+**Sivulöydökset kirjattu `TODO.md`:hen, ei korjattu tässä iteraatiossa:** (a) `history.py record` pudottaa hiljaa `title`-kentättömän kohteen (löytyi literature-eval 4:stä) — korjattu seuraavassa iteraatiossa (18), ks. alla, (b) jaettu `empty_history.json`-fixture ei ole samanaikaisuusturvallinen usean rinnakkaisen evalin kesken, (c) yleiskäyttöiset eval-subagentit saattavat itse haarauttaa lisää agentteja jotka perivät koko kontekstin ja ajavat osan putkesta uudelleen (havaittu kahdesti, ei turvallisuusriski mutta lisää kohinaa) — nämä kaksi ovat eval-harnessin, ei itse skillin, löydöksiä.
+
+## 21. Iteraatio 18: `history.py record`:n hiljainen title-pudotus korjattu
+
+Edellisen iteraation sivulöydös (literature-eval 4:n run-merkintä ilman `title`-kenttää katosi jäljettömästi) korjattu käyttäjän pyynnöstä 2026-10-23.
+
+**Juurisyy:** `cmd_record`:n silmukka (`if not title: continue`) ohitti kohteen täysin hiljaa — ei tulostusta, ei virhekoodia, pelkkä `continue`. Lopputulosteksti ("Tallennettu N kohdetta...") käytti lisäksi aina `len(new_items)`:ia eli SYÖTTEEN kokoa, ei montako OIKEASTI tallentui — joten jopa ajon oma yhteenvetoviesti valehteli jos jokin kohde ohitettiin.
+
+**Korjaus `scripts/history.py`:ssa (jaettu skripti, käyttää myös `vegan-news-feed-review` ja `vegan-literature-feed`):**
+- Jokainen ohitettu kohde (puuttuva `title`, tai kokonaan ei-JSON-objekti) tulostaa nyt `[varoitus]`-rivin stderr:iin, kertoen kohteen indeksin ja (title-tapauksessa) sen `type`-kentän.
+- Lopputulosteksti laskee nyt erikseen oikean tallennetun määrän (`saved_count`) ja ohitettujen määrän, eikä enää oleta että syötteen koko = tallennettu määrä.
+
+**Todennus, ei oletus:** testattu kaksi polkua — (1) kaikki kohteet kelvollisia, käyttäytyminen muuttumaton; (2) sekoitus title-kentätön run-merkintä + ei-objekti-kohde + yksi kelvollinen uutinen, varoitukset tulostuvat oikein molemmista ohitetuista, yhteenveto kertoo "1 kohdetta... 2 ohitettu". Lisäksi regressiotestattu `eval6`:n dedupe-testiä ja `eval9`:n `gaps`-fixturea vasten — kumpikaan ei muuttunut odottamattomasti.
